@@ -40,7 +40,7 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    print('${startAngle.toRadian} ${endAngle.toRadian}');
+    // print('${startAngle.toRadian} ${endAngle.toRadian}');
     final line1 =
         LineSegment.radial(startAngle.toRadian, 100, P(300, 300)).reversed();
     final line2 = LineSegment.radial(endAngle.toRadian, 100, P(300, 300));
@@ -101,7 +101,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ],
                 [
                   AngleComponent([line1, line2],
-                      paint: Paint()..color = Colors.purple),
+                      paint: Paint()..color = Colors.purple..shader),
                 ],
               ]),
             ),

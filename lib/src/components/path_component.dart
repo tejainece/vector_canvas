@@ -75,10 +75,14 @@ extension VectorCurveExt on VectorCurve {
       } else if (segment is QuadraticSegment) {
         path.quadraticBezierTo(
             segment.c.x, segment.c.y, segment.p2.x, segment.p2.y);
-      } /* TODO else if (segment is ArcSegment) {
-        path.arcTo(segment.rect, segment.startAngle, segment.sweepAngle,
-            segment.useCenter);
-      }*/
+      } else if (segment is ArcSegment) {
+        path.arcToPoint(segment.p2.o,
+            rotation: segment.rotation,
+            largeArc: segment.largeArc,
+            clockwise: segment.clockwise);
+      } else {
+        throw UnimplementedError('${segment.runtimeType}');
+      }
     }
     return path;
   }

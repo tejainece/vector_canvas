@@ -66,12 +66,16 @@ class AngleComponent implements Component {
       final line1 = pair.$1;
       final line2 = pair.$2;
       final center = line1.p2;
-      final angle = line2.angleTo(line1);
+      final angle = line2.angleTo(line1.reversed());
       final p1 = line1.pointAtDistanceFromP2(_radius);
       final p2 = line2.pointAtDistanceFromP1(_radius);
-      print('angle ${angle.value}');
-      final largeArc = angle.value.abs() > pi;
-      final clockwise = angle.value.abs() > pi / 2;
+      print('angle ${line2.angle.value} ${line2.angle.unclamped} ${line2.angle}');
+      // print('angle ${line1.angle} ${line2.angle} ${angle}');
+      bool largeArc = false;
+      bool clockwise = false;
+      if(angle.value > pi) {
+        largeArc = true;
+      }
 
       final path = Path()
         ..moveTo(p1.x, p1.y)

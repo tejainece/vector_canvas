@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:game_engine/game_engine.dart';
-import 'package:vector_canvas/src/components/points_component.dart';
-import 'package:vector_canvas/src/components/vertices_component.dart';
-import 'package:vector_canvas/vector_canvas.dart';
+import 'package:vector_canvas/src/components/lines_component.dart';
 import 'package:vector_path/vector_path.dart';
 
 void main() {
@@ -15,7 +13,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'lerp',
+      title: 'Line.normalAt',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
@@ -38,16 +36,16 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
   }
 
+  double t = 0.5;
+  double angle = 0;
+
   @override
   Widget build(BuildContext context) {
-    final quadratic = VectorCurve(
-        [QuadraticSegment(p1: P(100, 100), p2: P(200, 100), c: P(150, 50))]);
-    final cubic = VectorCurve([
-      CubicSegment(
-          p1: P(100, 300), p2: P(200, 400), c1: P(200, 300), c2: P(100, 400))
-    ]);
-    final quadraticPoint = quadratic.segments[0].lerp(t).o;
-    final cubicPoint = cubic.segments[0].lerp(t).o;
+    final placement = P(200, 200);
+    final line = LineSegment.radial(angle.toRadian, 100, placement);
+    final point = line.lerp(t);
+    final cw = line.normalAt(point, length: 100, cw: true);
+    final ccw = line.normalAt(point, length: 100, cw: false);
 
     return Scaffold(
       body: Column(
@@ -56,11 +54,11 @@ class _MyHomePageState extends State<MyHomePage> {
           Wrap(
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
+              Text('t: '),
               Container(
                 constraints: BoxConstraints(maxWidth: 200),
                 padding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
                 child: Slider(
-                  label: t.toStringAsFixed(3),
                   value: t,
                   onChanged: (value) {
                     setState(() {
@@ -73,6 +71,23 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
               Text(t.toStringAsFixed(3)),
+              Text('Angle: '),
+              Container(
+                constraints: BoxConstraints(maxWidth: 200),
+                padding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+                child: Slider(
+                  value: angle,
+                  onChanged: (value) {
+                    setState(() {
+                      angle = value;
+                    });
+                  },
+                  autofocus: true,
+                  min: 0,
+                  max: 360,
+                ),
+              ),
+              Text(angle.toStringAsFixed(3)),
             ],
           ),
           Expanded(
@@ -80,17 +95,11 @@ class _MyHomePageState extends State<MyHomePage> {
               color: Colors.brown,
               child: GameWidget(color: Colors.white, components: [
                 [
-                  PathComponent(quadratic, strokeWidth: 5),
-                  PathComponent(cubic, strokeWidth: 5),
+                  LinesComponent([line], strokeWidth: 5),
+                  LinesComponent([cw], strokeWidth: 5, color: Colors.blue),
+                  LinesComponent([ccw], strokeWidth: 5, color: Colors.orange),
                 ],
-                [
-                  PointsComponent([quadraticPoint],
-                      vertexPainter: CircularVertexPainter(12,
-                          fill: Paint()..color = Colors.blue)),
-                  PointsComponent([cubicPoint],
-                      vertexPainter: CircularVertexPainter(12,
-                          fill: Paint()..color = Colors.blue)),
-                ],
+                [],
               ]),
             ),
           ),
@@ -98,6 +107,4 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
-
-  double t = 0.1;
 }
