@@ -56,9 +56,33 @@ class LinesComponent implements Component {
                 radius: Radius.circular(line.radius),
                 largeArc: line.largeArc,
                 clockwise: line.clockwise,
-                // TODO rotation
               ),
             _paint);
+      } else if (line is ArcSegment) {
+        canvas.drawPath(
+            Path()
+              ..moveTo(line.p1.x, line.p1.y)
+              ..arcToPoint(line.p2.o,
+                  radius: Radius.elliptical(line.radius.x, line.radius.y),
+                  rotation: line.rotation,
+                  largeArc: line.largeArc,
+                  clockwise: line.clockwise),
+            _paint);
+      } else if (line is QuadraticSegment) {
+        canvas.drawPath(
+            Path()
+              ..moveTo(line.p1.x, line.p1.y)
+              ..quadraticBezierTo(line.c.x, line.c.y, line.p2.x, line.p2.y),
+            _paint);
+      } else if (line is CubicSegment) {
+        canvas.drawPath(
+            Path()
+              ..moveTo(line.p1.x, line.p2.y)
+              ..cubicTo(line.c1.x, line.c1.y, line.c2.x, line.c2.y, line.p2.x,
+                  line.p2.y),
+            _paint);
+      } else {
+        throw UnimplementedError('${line.runtimeType}');
       }
     }
   }
