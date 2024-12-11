@@ -93,18 +93,17 @@ class _MyHomePageState extends State<MyHomePage> {
             ],
           ),
           Expanded(
-            child: Container(
-              color: Colors.brown,
-              child: GameWidget(color: Colors.white, components: [
-                [
-                  PathComponent(polyLine, strokeWidth: 5),
-                ],
-                [
-                  AngleComponent([line1, line2],
-                      paint: Paint()..color = Colors.purple..shader),
-                ],
-              ]),
-            ),
+            child: GameWidget(color: Colors.white, components: [
+              [
+                PathComponent(polyLine, strokeWidth: 5),
+              ],
+              [
+                AngleComponent([line1, line2],
+                    paint: Paint()
+                      ..color = Colors.purple
+                      ..shader),
+              ],
+            ]),
           ),
         ],
       ),

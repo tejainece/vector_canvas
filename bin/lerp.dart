@@ -76,23 +76,20 @@ class _MyHomePageState extends State<MyHomePage> {
             ],
           ),
           Expanded(
-            child: Container(
-              color: Colors.brown,
-              child: GameWidget(color: Colors.white, components: [
-                [
-                  PathComponent(quadratic, strokeWidth: 5),
-                  PathComponent(cubic, strokeWidth: 5),
-                ],
-                [
-                  PointsComponent([quadraticPoint],
-                      vertexPainter: CircularVertexPainter(12,
-                          fill: Paint()..color = Colors.blue)),
-                  PointsComponent([cubicPoint],
-                      vertexPainter: CircularVertexPainter(12,
-                          fill: Paint()..color = Colors.blue)),
-                ],
-              ]),
-            ),
+            child: GameWidget(color: Colors.white, components: [
+              [
+                PathComponent(quadratic, strokeWidth: 5),
+                PathComponent(cubic, strokeWidth: 5),
+              ],
+              [
+                PointsComponent([quadraticPoint],
+                    vertexPainter: CircularVertexPainter(12,
+                        fill: Paint()..color = Colors.blue)),
+                PointsComponent([cubicPoint],
+                    vertexPainter: CircularVertexPainter(12,
+                        fill: Paint()..color = Colors.blue)),
+              ],
+            ]),
           ),
         ],
       ),

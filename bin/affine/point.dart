@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:game_engine/game_engine.dart';
-import 'package:vector_canvas/src/components/lines_component.dart';
-import 'package:vector_canvas/src/components/transform_component.dart';
+import 'package:vector_canvas/vector_canvas.dart';
 import 'package:vector_path/vector_path.dart';
 
 void main() {
@@ -45,8 +44,8 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     final affine1 = Affine2d.rotator(angle1);
     final affine2 = affine1.rotate(angle2);
-    final point1 = initial.affine(affine1);
-    final point2 = initial.affine(affine2);
+    final point1 = initial.transform(affine1);
+    final point2 = initial.transform(affine2);
 
     return Scaffold(
       body: Column(
@@ -57,21 +56,17 @@ class _MyHomePageState extends State<MyHomePage> {
             children: [],
           ),
           Expanded(
-            child: Container(
-              color: Colors.brown,
-              child: GameWidget(color: Colors.white, components: [
-                [
-                  CartesianComponent([
-                    LinesComponent([LineSegment(origin, initial)],
-                        strokeWidth: 3),
-                    LinesComponent([LineSegment(origin, point1)],
-                        color: Colors.red),
-                    LinesComponent([LineSegment(origin, point2)],
-                        color: Colors.blue),
-                  ]),
-                ],
-              ]),
-            ),
+            child: GameWidget(color: Colors.white,
+                transformer: originToCenter,
+                components: [
+              [
+                LinesComponent([LineSegment(origin, initial)], strokeWidth: 3),
+                LinesComponent([LineSegment(origin, point1)],
+                    color: Colors.red),
+                LinesComponent([LineSegment(origin, point2)],
+                    color: Colors.blue),
+              ],
+            ]),
           ),
         ],
       ),

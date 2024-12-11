@@ -79,7 +79,8 @@ extension VectorCurveExt on VectorCurve {
         path.arcToPoint(segment.p2.o,
             rotation: segment.rotation,
             largeArc: segment.largeArc,
-            clockwise: segment.clockwise);
+            clockwise: segment.clockwise,
+            radius: Radius.elliptical(segment.radius.x, segment.radius.y));
       } else {
         throw UnimplementedError('${segment.runtimeType}');
       }

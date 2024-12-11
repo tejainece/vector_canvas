@@ -51,15 +51,12 @@ class _MyHomePageState extends State<MyHomePage> {
             ],
           ),
           Expanded(
-            child: Container(
-              color: Colors.brown,
-              child: GameWidget(color: Colors.white, components: [
-                [
-                  LinesComponent([arc], strokeWidth: 7),
-                ],
-                [],
-              ]),
-            ),
+            child: GameWidget(color: Colors.white, components: [
+              [
+                LinesComponent([arc], strokeWidth: 7),
+              ],
+              [],
+            ]),
           ),
         ],
       ),

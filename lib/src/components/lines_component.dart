@@ -3,11 +3,11 @@ import 'package:game_engine/game_engine.dart';
 import 'package:vector_path/vector_path.dart';
 
 class LinesComponent implements Component {
-  final List<Segment> lines;
+  List<Segment> _lines;
 
   final Paint _paint = Paint();
 
-  LinesComponent(this.lines,
+  LinesComponent(this._lines,
       {Color color = Colors.black,
       double strokeWidth = 1,
       PaintingStyle style = PaintingStyle.stroke}) {
@@ -44,7 +44,7 @@ class LinesComponent implements Component {
 
   @override
   void render(Canvas canvas) {
-    for (final line in lines) {
+    for (final line in _lines) {
       if (line is LineSegment) {
         canvas.drawLine(line.p1.o, line.p2.o, _paint);
       } else if (line is CircularArcSegment) {
@@ -97,5 +97,20 @@ class LinesComponent implements Component {
   @override
   void handlePointerEvent(PointerEvent event) {
     // TODO
+  }
+  
+  void set({Iterable<Segment>? lines}) {
+    bool needsUpdate = false;
+
+    if (lines != null) {
+      if (!lines.isSame(this._lines)) {
+        _lines = lines.toList();
+        needsUpdate = true;
+      }
+    }
+
+    if (needsUpdate) {
+      _dirty = true;
+    }
   }
 }

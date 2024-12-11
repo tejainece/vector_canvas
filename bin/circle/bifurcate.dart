@@ -7,6 +7,8 @@ import 'package:vector_canvas/src/components/points_component.dart';
 import 'package:vector_canvas/src/components/vertices_component.dart';
 import 'package:vector_path/vector_path.dart';
 
+import '../_ui/controls.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -97,81 +99,23 @@ class _MyHomePageState extends State<MyHomePage> {
             ],
           ),
           Expanded(
-            child: Container(
-              color: Colors.brown,
-              child: GameWidget(color: Colors.white, components: [
-                [
-                  LinesComponent([arc], strokeWidth: 7),
-                  LinesComponent([arcA], strokeWidth: 1),
-                  LinesComponent([arcB], strokeWidth: 1, color: Colors.orange),
-                  LinesComponent([arcC], strokeWidth: 1, color: Colors.blue),
-                  LinesComponent([arc1], strokeWidth: 3, color: Colors.blue),
-                  LinesComponent([arc2], strokeWidth: 3, color: Colors.orange),
-                ],
-                [
-                  PointsComponent([pointBf.o],
-                      vertexPainter: CircularVertexPainter(7)),
-                ],
-              ]),
-            ),
+            child: GameWidget(color: Colors.white, components: [
+              [
+                LinesComponent([arc], strokeWidth: 7),
+                LinesComponent([arcA], strokeWidth: 1),
+                LinesComponent([arcB], strokeWidth: 1, color: Colors.orange),
+                LinesComponent([arcC], strokeWidth: 1, color: Colors.blue),
+                LinesComponent([arc1], strokeWidth: 3, color: Colors.blue),
+                LinesComponent([arc2], strokeWidth: 3, color: Colors.orange),
+              ],
+              [
+                PointsComponent([pointBf.o],
+                    vertexPainter: CircularVertexPainter(7)),
+              ],
+            ]),
           ),
         ],
       ),
     );
   }
-}
-
-Widget slider(String label, double value, double min, double max,
-    ValueSetter<double> onChanged) {
-  return Row(
-    mainAxisSize: MainAxisSize.min,
-    crossAxisAlignment: CrossAxisAlignment.center,
-    children: [
-      Text('$label: '),
-      Container(
-        constraints: BoxConstraints(maxWidth: 200),
-        padding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-        child: Slider(
-          value: value,
-          onChanged: onChanged,
-          min: min,
-          max: max,
-        ),
-      ),
-      Text(value.toStringAsFixed(2).toString()),
-    ],
-  );
-}
-
-Widget intSlider(String label, double value, double min, double max,
-    ValueSetter<double> onChanged) {
-  return Row(
-    mainAxisSize: MainAxisSize.min,
-    crossAxisAlignment: CrossAxisAlignment.center,
-    children: [
-      Text('$label: '),
-      Container(
-        constraints: BoxConstraints(maxWidth: 200),
-        padding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-        child: Slider(
-          value: value,
-          onChanged: onChanged,
-          min: min,
-          max: max,
-        ),
-      ),
-      Text(value.toInt().toString()),
-    ],
-  );
-}
-
-Widget checkbox(String label, bool value, ValueSetter<bool> onChanged) {
-  return Row(
-    mainAxisSize: MainAxisSize.min,
-    crossAxisAlignment: CrossAxisAlignment.center,
-    children: [
-      Text('$label: '),
-      Checkbox(value: value, onChanged: (v) => onChanged(v!)),
-    ],
-  );
 }

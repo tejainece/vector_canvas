@@ -57,9 +57,9 @@ class TransformComponent implements Component {
 
 class CartesianComponent extends Component {
   List<Component> _children;
-  Size _size = Size.zero;
+  Size _size;
 
-  CartesianComponent(this._children);
+  CartesianComponent(this._children, this._size);
 
   @override
   void render(Canvas canvas) {
@@ -79,11 +79,6 @@ class CartesianComponent extends Component {
     for(var child in _children) {
       child.tick(ctx);
     }
-    // TODO print(ctx.canvasSize);
-    if (_size != ctx.canvasSize) {
-      _size = ctx.canvasSize;
-      _dirty = true;
-    }
     if (!_dirty) return;
     _dirty = false;
     ctx.shouldRender();
@@ -96,11 +91,17 @@ class CartesianComponent extends Component {
     }
   }
 
-  void set({Iterable<Component>? children}) {
+  void set({Iterable<Component>? children, Size? size}) {
     bool needsUpdate = false;
     if (children != null) {
       _children = children.toList();
       needsUpdate = true;
+    }
+    if (size != null) {
+      if (size != _size) {
+        _size = size;
+        needsUpdate = true;
+      }
     }
     if (needsUpdate) {
       _dirty = true;

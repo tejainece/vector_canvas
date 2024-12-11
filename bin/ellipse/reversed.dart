@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:game_engine/game_engine.dart';
-import 'package:vector_canvas/src/components/lines_component.dart';
+import 'package:vector_canvas/vector_canvas.dart';
 import 'package:vector_path/vector_path.dart';
 
 import '../_ui/controls.dart';
@@ -17,7 +17,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Circle.reversed',
+      title: 'Line.normalAt',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
@@ -42,14 +42,16 @@ class _MyHomePageState extends State<MyHomePage> {
 
   double startAngle = 0.toRadian;
   double endAngle = 90.toRadian;
-  double radius = 100;
+  P radii = P(100, 70);
+  P center = P(0, 0);
+  double rotation = 0.toRadian;
 
   @override
   Widget build(BuildContext context) {
-    final center = P(150, 150);
-    final arc = CircularArcSegment(pointOnCircle(startAngle, radius, center),
-        pointOnCircle(endAngle, radius, center), radius,
-        largeArc: (endAngle - startAngle).abs() > pi,
+    final ellipse = Ellipse(radii, center: center, rotation: rotation);
+    final arc = ArcSegment(
+        ellipse.pointAtAngle(startAngle), ellipse.pointAtAngle(endAngle), radii,
+        largeArc: (startAngle - endAngle).abs() > pi,
         clockwise: startAngle < endAngle);
     final reversed = arc.reversed();
 
@@ -64,18 +66,21 @@ class _MyHomePageState extends State<MyHomePage> {
                   (v) => setState(() => startAngle = v)),
               slider('EndAngle', endAngle, 0, 2 * pi,
                   (v) => setState(() => endAngle = v)),
-              slider(
-                  'Radius', radius, 0, 200, (v) => setState(() => radius = v)),
+              // TODO
             ],
           ),
           Expanded(
-            child: GameWidget(color: Colors.white, components: [
-              [
-                LinesComponent([arc], strokeWidth: 7),
-                LinesComponent([reversed], strokeWidth: 3, color: Colors.blue),
-              ],
-              [],
-            ]),
+            child: GameWidget(
+                color: Colors.white,
+                transformer: originToCenter,
+                components: [
+                  [
+                    LinesComponent([arc], strokeWidth: 7),
+                    LinesComponent([reversed],
+                        strokeWidth: 3, color: Colors.blue),
+                  ],
+                  [],
+                ]),
           ),
         ],
       ),
