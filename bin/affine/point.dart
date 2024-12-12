@@ -60,10 +60,10 @@ class _MyHomePageState extends State<MyHomePage> {
                 transformer: originToCenter,
                 components: [
               [
-                LinesComponent([LineSegment(origin, initial)], strokeWidth: 3),
-                LinesComponent([LineSegment(origin, point1)],
+                SegmentsComponent([LineSegment(origin, initial)], strokeWidth: 3),
+                SegmentsComponent([LineSegment(origin, point1)],
                     color: Colors.red),
-                LinesComponent([LineSegment(origin, point2)],
+                SegmentsComponent([LineSegment(origin, point2)],
                     color: Colors.blue),
               ],
             ]),

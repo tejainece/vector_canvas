@@ -2,9 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:game_engine/game_engine.dart';
-import 'package:vector_canvas/src/components/lines_component.dart';
-import 'package:vector_canvas/src/components/points_component.dart';
-import 'package:vector_canvas/src/components/vertices_component.dart';
+import 'package:vector_canvas/vector_canvas.dart';
 import 'package:vector_path/vector_path.dart';
 
 import '../_ui/controls.dart';
@@ -101,12 +99,12 @@ class _MyHomePageState extends State<MyHomePage> {
           Expanded(
             child: GameWidget(color: Colors.white, components: [
               [
-                LinesComponent([arc], strokeWidth: 7),
-                LinesComponent([arcA], strokeWidth: 1),
-                LinesComponent([arcB], strokeWidth: 1, color: Colors.orange),
-                LinesComponent([arcC], strokeWidth: 1, color: Colors.blue),
-                LinesComponent([arc1], strokeWidth: 3, color: Colors.blue),
-                LinesComponent([arc2], strokeWidth: 3, color: Colors.orange),
+                SegmentsComponent([arc], strokeWidth: 7),
+                SegmentsComponent([arcA], strokeWidth: 1),
+                SegmentsComponent([arcB], strokeWidth: 1, color: Colors.orange),
+                SegmentsComponent([arcC], strokeWidth: 1, color: Colors.blue),
+                SegmentsComponent([arc1], strokeWidth: 3, color: Colors.blue),
+                SegmentsComponent([arc2], strokeWidth: 3, color: Colors.orange),
               ],
               [
                 PointsComponent([pointBf.o],

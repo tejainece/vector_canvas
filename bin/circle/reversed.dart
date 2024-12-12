@@ -2,7 +2,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 import 'package:game_engine/game_engine.dart';
-import 'package:vector_canvas/src/components/lines_component.dart';
+import 'package:vector_canvas/vector_canvas.dart';
 import 'package:vector_path/vector_path.dart';
 
 import '../_ui/controls.dart';
@@ -71,8 +71,8 @@ class _MyHomePageState extends State<MyHomePage> {
           Expanded(
             child: GameWidget(color: Colors.white, components: [
               [
-                LinesComponent([arc], strokeWidth: 7),
-                LinesComponent([reversed], strokeWidth: 3, color: Colors.blue),
+                SegmentsComponent([arc], strokeWidth: 7),
+                SegmentsComponent([reversed], strokeWidth: 3, color: Colors.blue),
               ],
               [],
             ]),

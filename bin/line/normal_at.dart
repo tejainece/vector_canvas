@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:game_engine/game_engine.dart';
-import 'package:vector_canvas/src/components/lines_component.dart';
+import 'package:vector_canvas/vector_canvas.dart';
 import 'package:vector_path/vector_path.dart';
 
 void main() {
@@ -93,9 +93,9 @@ class _MyHomePageState extends State<MyHomePage> {
           Expanded(
             child: GameWidget(color: Colors.white, components: [
               [
-                LinesComponent([line], strokeWidth: 5),
-                LinesComponent([cw], strokeWidth: 5, color: Colors.blue),
-                LinesComponent([ccw], strokeWidth: 5, color: Colors.orange),
+                SegmentsComponent([line], strokeWidth: 5),
+                SegmentsComponent([cw], strokeWidth: 5, color: Colors.blue),
+                SegmentsComponent([ccw], strokeWidth: 5, color: Colors.orange),
               ],
               [],
             ]),

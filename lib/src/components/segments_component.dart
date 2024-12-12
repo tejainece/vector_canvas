@@ -2,12 +2,12 @@ import 'package:flutter/material.dart';
 import 'package:game_engine/game_engine.dart';
 import 'package:vector_path/vector_path.dart';
 
-class LinesComponent implements Component {
-  List<Segment> _lines;
+class SegmentsComponent implements Component {
+  List<Segment> _segments;
 
   final Paint _paint = Paint();
 
-  LinesComponent(this._lines,
+  SegmentsComponent(this._segments,
       {Color color = Colors.black,
       double strokeWidth = 1,
       PaintingStyle style = PaintingStyle.stroke}) {
@@ -44,7 +44,7 @@ class LinesComponent implements Component {
 
   @override
   void render(Canvas canvas) {
-    for (final line in _lines) {
+    for (final line in _segments) {
       if (line is LineSegment) {
         canvas.drawLine(line.p1.o, line.p2.o, _paint);
       } else if (line is CircularArcSegment) {
@@ -98,15 +98,75 @@ class LinesComponent implements Component {
   void handlePointerEvent(PointerEvent event) {
     // TODO
   }
-  
+
   void set({Iterable<Segment>? lines}) {
     bool needsUpdate = false;
 
     if (lines != null) {
-      if (!lines.isSame(this._lines)) {
-        _lines = lines.toList();
+      if (!lines.isSame(this._segments)) {
+        _segments = lines.toList();
         needsUpdate = true;
       }
+    }
+
+    if (needsUpdate) {
+      _dirty = true;
+    }
+  }
+}
+
+class LineComponent extends Component {
+  LineSegment _line;
+
+  final Paint _paint = Paint();
+
+  LineComponent(this._line,
+      {Color color = Colors.black, double strokeWidth = 1}) {
+    _paint.color = color;
+    _paint.strokeWidth = strokeWidth;
+  }
+
+  @override
+  void render(Canvas canvas) {
+    canvas.drawLine(_line.p1.o, _line.p2.o, _paint);
+  }
+
+  @override
+  void tick(TickCtx ctx) {
+    if (!_dirty) return;
+    ctx.shouldRender();
+    _dirty = false;
+  }
+
+  @override
+  void handlePointerEvent(PointerEvent event) {
+    // TODO: implement handlePointerEvent
+  }
+
+  bool _dirty = true;
+
+  Color get color => _paint.color;
+
+  set color(Color value) {
+    if (_paint.color == value) return;
+    _paint.color = value;
+    _dirty = true;
+  }
+
+  void set({LineSegment? line, Color? color, double? strokeWidth}) {
+    bool needsUpdate = false;
+
+    if (line != null) {
+      _line = line;
+      needsUpdate = true;
+    }
+    if (color != null) {
+      _paint.color = color;
+      needsUpdate = true;
+    }
+    if (strokeWidth != null) {
+      _paint.strokeWidth = strokeWidth;
+      needsUpdate = true;
     }
 
     if (needsUpdate) {

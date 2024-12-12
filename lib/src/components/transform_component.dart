@@ -55,11 +55,11 @@ class TransformComponent implements Component {
   }
 }
 
-class CartesianComponent extends Component {
+class OriginToCenterComponent extends Component {
   List<Component> _children;
   Size _size;
 
-  CartesianComponent(this._children, this._size);
+  OriginToCenterComponent(this._children, this._size);
 
   @override
   void render(Canvas canvas) {
