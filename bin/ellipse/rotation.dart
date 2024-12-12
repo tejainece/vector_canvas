@@ -3,7 +3,6 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:game_engine/game_engine.dart';
-import 'package:vector_canvas/src/components/axis_component.dart';
 import 'package:vector_canvas/vector_canvas.dart';
 import 'package:vector_path/vector_path.dart';
 
@@ -19,7 +18,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Line.normalAt',
+      title: 'Ellipse.rotation',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
@@ -42,8 +41,6 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
   }
 
-  double startAngle = 0.toRadian;
-  double endAngle = 90.toRadian;
   P radii = P(100, 70);
   P center = P(0, 0);
   double rotation = 0.toRadian;
@@ -51,16 +48,20 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     print(rotation);
-    final ellipse = Ellipse(radii, center: center, rotation: rotation);
-    final arc = ArcSegment(
-      ellipse.pointAtAngle(startAngle),
-      ellipse.pointAtAngle(endAngle),
-      radii,
-      largeArc: (startAngle - endAngle).abs() > pi || startAngle == endAngle,
-      clockwise: startAngle < endAngle,
-      rotation: rotation,
-    );
-    final reversed = arc.reversed();
+    final ellipse = Ellipse(radii, center: center, rotation: 0);
+    final angles = <double>[
+      0,
+      pi / 3,
+      2 * pi / 3,
+      pi,
+      4 * pi / 3,
+      5 * pi / 3,
+    ];
+    final points =
+        angles.map((a) => ellipse.pointAtAngle(a)).map((p) => p.o).toList();
+    final ellipse2 = Ellipse(radii, center: center, rotation: rotation);
+    final points2 =
+        angles.map((a) => ellipse2.pointAtAngle(a)).map((p) => p.o).toList();
 
     return Scaffold(
       body: Column(
@@ -69,10 +70,6 @@ class _MyHomePageState extends State<MyHomePage> {
           Wrap(
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              slider('StartAngle', startAngle, 0, 2 * pi,
-                  (v) => setState(() => startAngle = v)),
-              slider('EndAngle', endAngle, 0, 2 * pi,
-                  (v) => setState(() => endAngle = v)),
               slider('Rotation', rotation, 0, 2 * pi,
                   (v) => setState(() => rotation = v)),
               // TODO
@@ -84,10 +81,12 @@ class _MyHomePageState extends State<MyHomePage> {
               transformer: originToCenterWith(),
               components: [
                 [
-                  SegmentsComponent([arc], strokeWidth: 7),
-                  SegmentsComponent([reversed],
-                      strokeWidth: 3, color: Colors.blue),
-                  AxisComponent(viewport),
+                  PointsComponent(points,
+                      vertexPainter: CircularVertexPainter(10,
+                          fill: Paint()..color = Colors.blue)),
+                  PointsComponent(points2,
+                      vertexPainter: CircularVertexPainter(5,
+                          fill: Paint()..color = Colors.red)),
                 ],
                 [],
               ],

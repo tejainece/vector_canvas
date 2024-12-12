@@ -53,10 +53,8 @@ class _MyHomePageState extends State<MyHomePage> {
     print(rotation);
     final ellipse = Ellipse(radii, center: center, rotation: rotation);
     final arc = ArcSegment(
-      ellipse.pointAtAngle(startAngle),
-      ellipse.pointAtAngle(endAngle),
-      radii,
-      largeArc: (startAngle - endAngle).abs() > pi || startAngle == endAngle,
+      ellipse.pointAtAngle(startAngle), ellipse.pointAtAngle(endAngle), radii,
+      largeArc: (startAngle - endAngle).abs() > pi,
       clockwise: startAngle < endAngle,
       rotation: rotation,
     );
@@ -70,11 +68,11 @@ class _MyHomePageState extends State<MyHomePage> {
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               slider('StartAngle', startAngle, 0, 2 * pi,
-                  (v) => setState(() => startAngle = v)),
+                      (v) => setState(() => startAngle = v)),
               slider('EndAngle', endAngle, 0, 2 * pi,
-                  (v) => setState(() => endAngle = v)),
+                      (v) => setState(() => endAngle = v)),
               slider('Rotation', rotation, 0, 2 * pi,
-                  (v) => setState(() => rotation = v)),
+                      (v) => setState(() => rotation = v)),
               // TODO
             ],
           ),

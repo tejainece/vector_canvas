@@ -64,7 +64,7 @@ class SegmentsComponent implements Component {
               ..moveTo(line.p1.x, line.p1.y)
               ..arcToPoint(line.p2.o,
                   radius: Radius.elliptical(line.radius.x, line.radius.y),
-                  rotation: line.rotation,
+                  rotation: line.rotation.toDegree,
                   largeArc: line.largeArc,
                   clockwise: line.clockwise),
             _paint);
@@ -99,12 +99,12 @@ class SegmentsComponent implements Component {
     // TODO
   }
 
-  void set({Iterable<Segment>? lines}) {
+  void set({Iterable<Segment>? segments}) {
     bool needsUpdate = false;
 
-    if (lines != null) {
-      if (!lines.isSame(this._segments)) {
-        _segments = lines.toList();
+    if (segments != null) {
+      if (!segments.isSame(_segments)) {
+        _segments = segments.toList();
         needsUpdate = true;
       }
     }
