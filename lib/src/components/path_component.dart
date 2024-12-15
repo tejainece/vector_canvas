@@ -80,7 +80,7 @@ extension VectorCurveExt on VectorCurve {
             rotation: segment.rotation,
             largeArc: segment.largeArc,
             clockwise: segment.clockwise,
-            radius: Radius.elliptical(segment.radius.x, segment.radius.y));
+            radius: Radius.elliptical(segment.radii.x, segment.radii.y));
       } else {
         throw UnimplementedError('${segment.runtimeType}');
       }

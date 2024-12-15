@@ -63,7 +63,7 @@ class SegmentsComponent implements Component {
             Path()
               ..moveTo(line.p1.x, line.p1.y)
               ..arcToPoint(line.p2.o,
-                  radius: Radius.elliptical(line.radius.x, line.radius.y),
+                  radius: Radius.elliptical(line.radii.x, line.radii.y),
                   rotation: line.rotation.toDegree,
                   largeArc: line.largeArc,
                   clockwise: line.clockwise),

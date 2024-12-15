@@ -1,7 +1,12 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:game_engine/game_engine.dart';
 import 'package:vector_canvas/vector_canvas.dart';
 import 'package:vector_path/vector_path.dart';
+
+import '../_ui/controls.dart';
 
 void main() {
   runApp(const MyApp());
@@ -36,9 +41,28 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
   }
 
+  double startAngle = 0.toRadian;
+  double endAngle = 90.toRadian;
+  P radii = P(100, 70);
+  P center = P(0, 0);
+  double rotation = 0.toRadian;
+
   @override
   Widget build(BuildContext context) {
-    final arc = ArcSegment(P(100, 200), P(300, 400), P(150, 100));
+    final ellipse = Ellipse(radii, center: center, rotation: rotation);
+    final arc = ArcSegment(
+      ellipse.pointAtAngle(startAngle),
+      ellipse.pointAtAngle(endAngle),
+      radii,
+      largeArc: (startAngle - endAngle).abs() > pi || startAngle == endAngle,
+      clockwise: startAngle < endAngle,
+      rotation: rotation,
+    );
+    print(
+        '${ellipse.angleOfPoint(ellipse.pointAtAngle(startAngle))} ${ellipse.angleOfPoint(ellipse.pointAtAngle(endAngle))}');
+    /*print(arc.p1);
+    print(ellipse.unitCircleTransform);
+    print(ellipse.inverseUnitCircleTransform);*/
 
     return Scaffold(
       body: Column(
@@ -47,19 +71,52 @@ class _MyHomePageState extends State<MyHomePage> {
           Wrap(
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              // TODO
+              slider('StartAngle', startAngle, 0, 2 * pi,
+                  (v) => setState(() => startAngle = v)),
+              slider('EndAngle', endAngle, 0, 2 * pi,
+                  (v) => setState(() => endAngle = v)),
+              slider('Rotation', rotation, 0, 2 * pi,
+                  (v) => setState(() => rotation = v)),
+              slider('centerX', center.x, -400, 400,
+                  (v) => setState(() => center = P(v, center.y))),
+              slider('centerY', center.y, -400, 400,
+                  (v) => setState(() => center = P(center.x, v))),
+              slider('radiiX', radii.x, 0, 400,
+                  (v) => setState(() => radii = P(v, radii.y))),
+              slider('radiiY', radii.y, -400, 400,
+                  (v) => setState(() => radii = P(radii.x, v))),
             ],
           ),
           Expanded(
-            child: GameWidget(color: Colors.white, components: [
-              [
-                SegmentsComponent([arc], strokeWidth: 7),
+            child: GameWidget(
+              color: Colors.white,
+              transformer: originToCenterWith(),
+              components: [
+                [
+                  SegmentsComponent([arc], strokeWidth: 7),
+                ],
+                [
+                  PointsComponent([center.o],
+                      vertexPainter: CircularVertexPainter(10)),
+                  PointsComponent([arc.center.o],
+                      vertexPainter: CircularVertexPainter(5,
+                          fill: Paint()..color = Colors.orange)),
+                ],
               ],
-              [],
-            ]),
+              onResize: (size) {
+                SchedulerBinding.instance.addPostFrameCallback((_) {
+                  setState(() {
+                    viewport = Rect.fromLTWH(-size.width / 2, -size.height / 2,
+                        size.width, size.height);
+                  });
+                });
+              },
+            ),
           ),
         ],
       ),
     );
   }
+
+  Rect viewport = Rect.fromLTWH(-200, -200, 400, 400);
 }

@@ -50,7 +50,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    print(rotation);
     final ellipse = Ellipse(radii, center: center, rotation: rotation);
     final arc = ArcSegment(
       ellipse.pointAtAngle(startAngle),
