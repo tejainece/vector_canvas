@@ -1,5 +1,3 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:game_engine/game_engine.dart';
 import 'package:vector_canvas/vector_canvas.dart';
