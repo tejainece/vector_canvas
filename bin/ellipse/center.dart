@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:game_engine/game_engine.dart';
 import 'package:vector_canvas/vector_canvas.dart';
 import 'package:vector_path/vector_path.dart';
@@ -56,8 +55,6 @@ class _MyHomePageState extends State<MyHomePage> {
       clockwise: startAngle < endAngle,
       rotation: rotation,
     );
-    print(
-        '${ellipse.angleOfPoint(ellipse.pointAtAngle(startAngle))} ${ellipse.angleOfPoint(ellipse.pointAtAngle(endAngle))}');
     /*print(arc.p1);
     print(ellipse.unitCircleTransform);
     print(ellipse.inverseUnitCircleTransform);*/
@@ -91,22 +88,20 @@ class _MyHomePageState extends State<MyHomePage> {
               transformer: originToCenterWith(),
               components: [
                 [
-                  SegmentsComponent([arc], strokeWidth: 7),
+                  SegmentsComponent([arc], stroke: Stroke(strokeWidth: 7)),
                 ],
                 [
                   PointsComponent([center.o],
                       vertexPainter: CircularVertexPainter(10)),
                   PointsComponent([arc.center.o],
                       vertexPainter: CircularVertexPainter(5,
-                          fill: Paint()..color = Colors.orange)),
+                          fill: Fill(color: Colors.orange))),
                 ],
               ],
               onResize: (size) {
-                SchedulerBinding.instance.addPostFrameCallback((_) {
-                  setState(() {
-                    viewport = Rect.fromLTWH(-size.width / 2, -size.height / 2,
-                        size.width, size.height);
-                  });
+                setState(() {
+                  viewport = Rect.fromLTWH(-size.width / 2, -size.height / 2,
+                      size.width, size.height);
                 });
               },
             ),

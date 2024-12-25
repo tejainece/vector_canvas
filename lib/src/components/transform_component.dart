@@ -24,7 +24,7 @@ class TransformComponent implements Component {
 
   @override
   void tick(TickCtx ctx) {
-    for(var child in _children) {
+    for (var child in _children) {
       child.tick(ctx);
     }
     if (!_dirty) return;
@@ -76,7 +76,7 @@ class OriginToCenterComponent extends Component {
 
   @override
   void tick(TickCtx ctx) {
-    for(var child in _children) {
+    for (var child in _children) {
       child.tick(ctx);
     }
     if (!_dirty) return;

@@ -3,6 +3,8 @@ import 'package:game_engine/game_engine.dart';
 import 'package:vector_canvas/vector_canvas.dart';
 import 'package:vector_path/vector_path.dart';
 
+import '../_ui/controls.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -40,12 +42,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     final quadratic = VectorCurve(
         [QuadraticSegment(p1: P(100, 100), p2: P(200, 100), c: P(150, 50))]);
-    final cubic = VectorCurve([
-      CubicSegment(
-          p1: P(100, 300), p2: P(200, 400), c1: P(200, 300), c2: P(100, 400))
-    ]);
     final quadraticPoint = quadratic.segments[0].lerp(t).o;
-    final cubicPoint = cubic.segments[0].lerp(t).o;
 
     return Scaffold(
       body: Column(
@@ -54,38 +51,19 @@ class _MyHomePageState extends State<MyHomePage> {
           Wrap(
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              Container(
-                constraints: BoxConstraints(maxWidth: 200),
-                padding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
-                child: Slider(
-                  label: t.toStringAsFixed(3),
-                  value: t,
-                  onChanged: (value) {
-                    setState(() {
-                      t = value;
-                    });
-                  },
-                  autofocus: true,
-                  min: 0,
-                  max: 1,
-                ),
-              ),
-              Text(t.toStringAsFixed(3)),
+              slider('T', t, 0, 1, (v) => setState(() => t = v)),
             ],
           ),
           Expanded(
             child: GameWidget(color: Colors.white, components: [
               [
-                PathComponent(quadratic, strokeWidth: 5),
-                PathComponent(cubic, strokeWidth: 5),
+                PathComponent(quadratic.segments,
+                    stroke: Stroke(strokeWidth: 5)),
               ],
               [
                 PointsComponent([quadraticPoint],
                     vertexPainter: CircularVertexPainter(12,
-                        fill: Paint()..color = Colors.blue)),
-                PointsComponent([cubicPoint],
-                    vertexPainter: CircularVertexPainter(12,
-                        fill: Paint()..color = Colors.blue)),
+                        fill: Fill(color: Colors.blue))),
               ],
             ]),
           ),

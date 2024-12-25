@@ -93,9 +93,11 @@ class _MyHomePageState extends State<MyHomePage> {
           Expanded(
             child: GameWidget(color: Colors.white, components: [
               [
-                SegmentsComponent([line], strokeWidth: 5),
-                SegmentsComponent([cw], strokeWidth: 5, color: Colors.blue),
-                SegmentsComponent([ccw], strokeWidth: 5, color: Colors.orange),
+                SegmentsComponent([line], stroke: Stroke(strokeWidth: 5)),
+                SegmentsComponent([cw],
+                    stroke: Stroke(strokeWidth: 5, color: Colors.blue)),
+                SegmentsComponent([ccw],
+                    stroke: Stroke(strokeWidth: 5, color: Colors.orange)),
               ],
               [],
             ]),

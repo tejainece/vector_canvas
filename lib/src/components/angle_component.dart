@@ -1,103 +1,47 @@
-
 import 'package:flutter/material.dart';
 import 'package:game_engine/game_engine.dart';
+import 'package:vector_canvas/vector_canvas.dart';
 import 'package:vector_path/vector_path.dart';
 
-class AngleComponent implements Component {
-  Iterable<LineSegment> _lines = [];
+class AnglesComponent implements Component {
+  List<LineSegment> _lines = [];
 
+  List<Path> _pies = [];
   List<Path> _arcs = [];
 
   double _radius = 25;
 
-  Paint _paint = Paint()
-    ..color = Colors.black
-    ..style = PaintingStyle.fill;
+  ToPaint? _piePainter;
+  Paint? _piePaint;
+  Stroke? _arcPainter;
+  Paint? _arcPaint;
 
-  AngleComponent(Iterable<LineSegment> lines,
-      {double radius = 25, Paint? paint}) {
-    set(lines: lines, radius: radius, paint: paint);
-  }
-
-  bool _dirty = false;
-
-  void set({Iterable<LineSegment>? lines, double? radius, Paint? paint}) {
-    bool needsUpdate = false;
-
-    if (lines != null) {
-      if (!lines.isSame(_lines)) {
-        _lines = lines;
-        needsUpdate = true;
-      }
-    }
-
-    if (radius != null) {
-      if (radius != _radius) {
-        _radius = radius;
-        needsUpdate = true;
-      }
-    }
-
-    if (paint != null) {
-      _paint = paint;
-      needsUpdate = true;
-    }
-
-    if (needsUpdate) _update();
-  }
-
-  set radius(double radius) {
-    if (radius == _radius) return;
+  AnglesComponent(Iterable<LineSegment> lines,
+      {double radius = 25,
+      ToPaint? piePainter,
+      Stroke? arcPainter = const Stroke()}) {
     _radius = radius;
-    _update();
-  }
+    _lines = lines.toList();
+    _updateArcs();
+    _updatePies();
 
-  set lines(Iterable<LineSegment> lines) {
-    if (_lines.isSame(lines)) return;
-    _lines = lines;
-    _update();
-  }
-
-  void _update() {
-    _dirty = true;
-    _arcs = [];
-    for (final pair in _lines.pairs()) {
-      final line1 = pair.$1;
-      final line2 = pair.$2;
-      final center = line1.p2;
-      final angle = line2.angleTo(line1.reversed());
-      final p1 = line1.pointAtDistanceFromP2(_radius);
-      final p2 = line2.pointAtDistanceFromP1(_radius);
-      print('angle ${line2.angle.value} ${line2.angle.unclamped} ${line2.angle}');
-      // print('angle ${line1.angle} ${line2.angle} ${angle}');
-      bool largeArc = false;
-      bool clockwise = false;
-      if(angle.value > pi) {
-        largeArc = true;
-      }
-
-      final path = Path()
-        ..moveTo(p1.x, p1.y)
-        ..lineTo(center.x, center.y)
-        ..lineTo(p2.x, p2.y)
-        ..arcToPoint(p1.o,
-            radius: Radius.circular(_radius),
-            clockwise: clockwise,
-            largeArc: largeArc)
-        ..close();
-      _arcs.add(path);
-    }
-  }
-
-  set paint(Paint paint) {
-    _paint = paint;
-    _dirty = true;
+    _piePainter = piePainter;
+    _piePaint = _piePainter?.paint;
+    _arcPainter = arcPainter;
+    _arcPaint = _arcPainter?.paint;
   }
 
   @override
   void render(Canvas canvas) {
-    for (final arc in _arcs) {
-      canvas.drawPath(arc, _paint);
+    if (_piePaint != null) {
+      for (final pie in _pies) {
+        if (_piePaint != null) canvas.drawPath(pie, _piePaint!);
+      }
+    }
+    if (_arcPaint != null) {
+      for (final arc in _arcs) {
+        if (_arcPaint != null) canvas.drawPath(arc, _arcPaint!);
+      }
     }
   }
 
@@ -106,6 +50,89 @@ class AngleComponent implements Component {
     if (!_dirty) return;
     ctx.shouldRender();
     _dirty = false;
+  }
+
+  bool _dirty = true;
+
+  void set(
+      {Iterable<LineSegment>? lines,
+      double? radius,
+      Optional<ToPaint>? piePainter,
+      Optional<Stroke>? arcPainter}) {
+    bool needsUpdate = false;
+    if (lines != null) {
+      if (!lines.isSame(_lines)) {
+        _lines = lines.toList();
+        needsUpdate = true;
+      }
+    }
+    if (radius != null) {
+      if (radius != _radius) {
+        _radius = radius;
+        needsUpdate = true;
+      }
+    }
+    if (needsUpdate) {
+      _updateArcs();
+      _updatePies();
+    }
+    if (piePainter != null) {
+      if (piePainter.value != _piePainter) {
+        _piePainter = piePainter.value;
+        _piePaint = _piePainter?.paint;
+        needsUpdate = true;
+      }
+    }
+    if (arcPainter != null) {
+      if (arcPainter.value != _arcPainter) {
+        _arcPainter = arcPainter.value;
+        _arcPaint = _arcPainter?.paint;
+        needsUpdate = true;
+      }
+    }
+    _dirty = _dirty || needsUpdate;
+  }
+
+  void _updatePies() {
+    _pies = [];
+    for (final pair in _lines.pairs()) {
+      final line1 = pair.$1;
+      final line2 = pair.$2;
+      final center = line1.p2;
+      final angle = line2.angleTo(line1.reversed());
+      final p1 = line1.pointAtDistanceFromP2(_radius);
+      final p2 = line2.pointAtDistanceFromP1(_radius);
+      bool largeArc = angle.value > pi;
+      bool clockwise = false;
+      _pies.add(Path()
+        ..moveTo(p1.x, p1.y)
+        ..lineTo(center.x, center.y)
+        ..lineTo(p2.x, p2.y)
+        ..arcToPoint(p1.o,
+            radius: Radius.circular(_radius),
+            clockwise: clockwise,
+            largeArc: largeArc)
+        ..close());
+    }
+  }
+
+  void _updateArcs() {
+    _arcs = [];
+    for (final pair in _lines.pairs()) {
+      final line1 = pair.$1;
+      final line2 = pair.$2;
+      final angle = line2.angleTo(line1.reversed());
+      final p1 = line1.pointAtDistanceFromP2(_radius);
+      final p2 = line2.pointAtDistanceFromP1(_radius);
+      bool largeArc = angle.value > pi;
+      bool clockwise = false;
+      _arcs.add(Path()
+        ..moveTo(p2.x, p2.y)
+        ..arcToPoint(p1.o,
+            radius: Radius.circular(_radius),
+            clockwise: clockwise,
+            largeArc: largeArc));
+    }
   }
 
   @override

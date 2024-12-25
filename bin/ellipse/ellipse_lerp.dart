@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:game_engine/game_engine.dart';
+import 'package:vector_canvas/src/components/axis_component.dart';
+import 'package:vector_canvas/src/components/shape/shape.dart';
 import 'package:vector_canvas/vector_canvas.dart';
 import 'package:vector_path/vector_path.dart';
 
@@ -15,7 +17,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Ellipse.rotation',
+      title: 'Ellipse.lerp',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
@@ -38,27 +40,15 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
   }
 
-  P radii = P(100, 70);
-  P center = P(0, 0);
-  double rotation = 0.toRadian;
+  double t = 0;
+  double rotation = 0;
+  var center = P(0, 0);
+  var radii = P(100, 80);
 
   @override
   Widget build(BuildContext context) {
-    print(rotation);
-    final ellipse = Ellipse(radii, center: center, rotation: 0);
-    final angles = <double>[
-      0,
-      pi / 3,
-      2 * pi / 3,
-      pi,
-      4 * pi / 3,
-      5 * pi / 3,
-    ];
-    final points =
-        angles.map((a) => ellipse.pointAtAngle(a)).map((p) => p.o).toList();
-    final ellipse2 = Ellipse(radii, center: center, rotation: rotation);
-    final points2 =
-        angles.map((a) => ellipse2.pointAtAngle(a)).map((p) => p.o).toList();
+    final ellipse = Ellipse(radii, center: center, rotation: rotation);
+    final point = ellipse.lerp(t).o;
 
     return Scaffold(
       body: Column(
@@ -67,25 +57,35 @@ class _MyHomePageState extends State<MyHomePage> {
           Wrap(
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              slider('Rotation', rotation, 0, 2 * pi,
-                  (v) => setState(() => rotation = v)),
-              // TODO
+              slider('t', t, 0, 1, (value) => setState(() => t = value)),
+              slider('Theta', rotation, 0, 2 * pi,
+                  (value) => setState(() => rotation = value)),
+              slider('Center.x', center.x, -400, 400,
+                  (value) => setState(() => center = P(value, center.y))),
+              slider('Center.y', center.y, -400, 400,
+                  (value) => setState(() => center = P(center.x, value))),
+              slider('Radii.x', radii.x, 0, 400,
+                  (value) => setState(() => radii = P(value, radii.y))),
+              slider('Radii.y', radii.y, 0, 400,
+                  (value) => setState(() => radii = P(radii.x, value))),
             ],
           ),
           Expanded(
             child: GameWidget(
               color: Colors.white,
-              transformer: originToCenterWith(),
+              transformer: originToCenter,
               components: [
                 [
-                  PointsComponent(points,
-                      vertexPainter: CircularVertexPainter(10,
-                          fill: Fill(color: Colors.blue))),
-                  PointsComponent(points2,
-                      vertexPainter: CircularVertexPainter(5,
-                          fill: Fill(color: Colors.red))),
+                  AxisComponent(viewport),
                 ],
-                [],
+                [
+                  EllipseComponent(ellipse),
+                ],
+                [
+                  PointsComponent([point],
+                      vertexPainter: CircularVertexPainter(12,
+                          fill: Fill(color: Colors.blue))),
+                ],
               ],
               onResize: (size) {
                 setState(() {

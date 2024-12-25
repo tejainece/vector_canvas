@@ -56,17 +56,19 @@ class _MyHomePageState extends State<MyHomePage> {
             children: [],
           ),
           Expanded(
-            child: GameWidget(color: Colors.white,
+            child: GameWidget(
+                color: Colors.white,
                 transformer: originToCenter,
                 components: [
-              [
-                SegmentsComponent([LineSegment(origin, initial)], strokeWidth: 3),
-                SegmentsComponent([LineSegment(origin, point1)],
-                    color: Colors.red),
-                SegmentsComponent([LineSegment(origin, point2)],
-                    color: Colors.blue),
-              ],
-            ]),
+                  [
+                    SegmentsComponent([LineSegment(origin, initial)],
+                        stroke: Stroke(strokeWidth: 3)),
+                    SegmentsComponent([LineSegment(origin, point1)],
+                        stroke: Stroke(color: Colors.red)),
+                    SegmentsComponent([LineSegment(origin, point2)],
+                        stroke: Stroke(color: Colors.blue)),
+                  ],
+                ]),
           ),
         ],
       ),

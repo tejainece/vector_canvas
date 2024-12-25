@@ -1,6 +1,4 @@
-
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:game_engine/game_engine.dart';
 import 'package:vector_canvas/src/components/axis_component.dart';
 import 'package:vector_canvas/vector_canvas.dart';
@@ -52,7 +50,9 @@ class _MyHomePageState extends State<MyHomePage> {
     print(rotation);
     final ellipse = Ellipse(radii, center: center, rotation: rotation);
     final arc = ArcSegment(
-      ellipse.pointAtAngle(startAngle), ellipse.pointAtAngle(endAngle), radii,
+      ellipse.pointAtAngle(startAngle),
+      ellipse.pointAtAngle(endAngle),
+      radii,
       largeArc: (startAngle - endAngle).abs() > pi,
       clockwise: startAngle < endAngle,
       rotation: rotation,
@@ -67,11 +67,11 @@ class _MyHomePageState extends State<MyHomePage> {
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               slider('StartAngle', startAngle, 0, 2 * pi,
-                      (v) => setState(() => startAngle = v)),
+                  (v) => setState(() => startAngle = v)),
               slider('EndAngle', endAngle, 0, 2 * pi,
-                      (v) => setState(() => endAngle = v)),
+                  (v) => setState(() => endAngle = v)),
               slider('Rotation', rotation, 0, 2 * pi,
-                      (v) => setState(() => rotation = v)),
+                  (v) => setState(() => rotation = v)),
               // TODO
             ],
           ),
@@ -81,19 +81,17 @@ class _MyHomePageState extends State<MyHomePage> {
               transformer: originToCenterWith(),
               components: [
                 [
-                  SegmentsComponent([arc], strokeWidth: 7),
+                  SegmentsComponent([arc], stroke: Stroke(strokeWidth: 7)),
                   SegmentsComponent([reversed],
-                      strokeWidth: 3, color: Colors.blue),
+                      stroke: Stroke(strokeWidth: 3, color: Colors.blue)),
                   AxisComponent(viewport),
                 ],
                 [],
               ],
               onResize: (size) {
-                SchedulerBinding.instance.addPostFrameCallback((_) {
-                  setState(() {
-                    viewport = Rect.fromLTWH(-size.width / 2, -size.height / 2,
-                        size.width, size.height);
-                  });
+                setState(() {
+                  viewport = Rect.fromLTWH(-size.width / 2, -size.height / 2,
+                      size.width, size.height);
                 });
               },
             ),

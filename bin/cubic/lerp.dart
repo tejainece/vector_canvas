@@ -3,8 +3,6 @@ import 'package:game_engine/game_engine.dart';
 import 'package:vector_canvas/vector_canvas.dart';
 import 'package:vector_path/vector_path.dart';
 
-import '../_ui/controls.dart';
-
 void main() {
   runApp(const MyApp());
 }
@@ -15,7 +13,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Circle.reversed',
+      title: 'lerp',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
@@ -38,18 +36,13 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
   }
 
-  double startAngle = 0.toRadian;
-  double endAngle = 90.toRadian;
-  double radius = 100;
-
   @override
   Widget build(BuildContext context) {
-    final center = P(150, 150);
-    final arc = CircularArcSegment(pointOnCircle(startAngle, radius, center),
-        pointOnCircle(endAngle, radius, center), radius,
-        largeArc: (endAngle - startAngle).abs() > pi,
-        clockwise: startAngle < endAngle);
-    final reversed = arc.reversed();
+    final cubic = VectorCurve([
+      CubicSegment(
+          p1: P(100, 300), p2: P(200, 400), c1: P(200, 300), c2: P(100, 400))
+    ]);
+    final cubicPoint = cubic.segments[0].lerp(t).o;
 
     return Scaffold(
       body: Column(
@@ -58,26 +51,41 @@ class _MyHomePageState extends State<MyHomePage> {
           Wrap(
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              slider('StartAngle', startAngle, 0, 2 * pi,
-                  (v) => setState(() => startAngle = v)),
-              slider('EndAngle', endAngle, 0, 2 * pi,
-                  (v) => setState(() => endAngle = v)),
-              slider(
-                  'Radius', radius, 0, 200, (v) => setState(() => radius = v)),
+              Container(
+                constraints: BoxConstraints(maxWidth: 200),
+                padding: EdgeInsets.symmetric(vertical: 5, horizontal: 5),
+                child: Slider(
+                  label: t.toStringAsFixed(3),
+                  value: t,
+                  onChanged: (value) {
+                    setState(() {
+                      t = value;
+                    });
+                  },
+                  autofocus: true,
+                  min: 0,
+                  max: 1,
+                ),
+              ),
+              Text(t.toStringAsFixed(3)),
             ],
           ),
           Expanded(
             child: GameWidget(color: Colors.white, components: [
               [
-                SegmentsComponent([arc], stroke: Stroke(strokeWidth: 7)),
-                SegmentsComponent([reversed],
-                    stroke: Stroke(strokeWidth: 3, color: Colors.blue)),
+                PathComponent(cubic.segments, stroke: Stroke(strokeWidth: 5)),
               ],
-              [],
+              [
+                PointsComponent([cubicPoint],
+                    vertexPainter: CircularVertexPainter(12,
+                        fill: Fill(color: Colors.blue))),
+              ],
             ]),
           ),
         ],
       ),
     );
   }
+
+  double t = 0.1;
 }

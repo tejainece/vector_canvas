@@ -39,39 +39,27 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final quadratic = VectorCurve(
-        [QuadraticSegment(p1: P(100, 100), p2: P(200, 100), c: P(150, 50))]);
     final cubic = VectorCurve([
       CubicSegment(
           p1: P(100, 300), p2: P(200, 400), c1: P(200, 300), c2: P(100, 400))
     ]);
-    final quadraticSplit = quadratic.splitSegments(3);
     final cubicSplit = cubic.splitSegments(3);
 
     return Scaffold(
       body: Center(
         child: GameWidget(color: Colors.white, components: [
           [
-            PathComponent(quadratic, strokeWidth: 5),
-            PathComponent(quadraticSplit, strokeWidth: 3, color: Colors.red),
-            PathComponent(cubic, strokeWidth: 5),
-            PathComponent(cubicSplit, strokeWidth: 3, color: Colors.red),
+            PathComponent(cubic.segments, stroke: Stroke(strokeWidth: 5)),
+            PathComponent(cubicSplit.segments,
+                stroke: Stroke(strokeWidth: 3, color: Colors.red)),
           ],
           [
-            VerticesComponent(
-              quadratic,
-              vertexPainter:
-                  CircularVertexPainter(12, fill: Paint()..color = Colors.blue),
-            ),
-            VerticesComponent(quadraticSplit,
-                vertexPainter: CircularVertexPainter(10,
-                    fill: Paint()..color = Colors.red)),
-            VerticesComponent(cubic,
-                vertexPainter: CircularVertexPainter(12,
-                    fill: Paint()..color = Colors.blue)),
-            VerticesComponent(cubicSplit,
-                vertexPainter: CircularVertexPainter(10,
-                    fill: Paint()..color = Colors.red)),
+            VerticesComponent(cubic.segments,
+                vertexPainter:
+                    CircularVertexPainter(12, fill: Fill(color: Colors.blue))),
+            VerticesComponent(cubicSplit.segments,
+                vertexPainter:
+                    CircularVertexPainter(10, fill: Fill(color: Colors.red))),
           ],
         ]),
       ),

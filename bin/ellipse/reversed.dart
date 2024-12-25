@@ -1,6 +1,4 @@
-
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'package:game_engine/game_engine.dart';
 import 'package:vector_canvas/src/components/axis_component.dart';
 import 'package:vector_canvas/vector_canvas.dart';
@@ -82,19 +80,17 @@ class _MyHomePageState extends State<MyHomePage> {
               transformer: originToCenterWith(),
               components: [
                 [
-                  SegmentsComponent([arc], strokeWidth: 7),
+                  SegmentsComponent([arc], stroke: Stroke(strokeWidth: 7)),
                   SegmentsComponent([reversed],
-                      strokeWidth: 3, color: Colors.blue),
+                      stroke: Stroke(strokeWidth: 3, color: Colors.blue)),
                   AxisComponent(viewport),
                 ],
                 [],
               ],
               onResize: (size) {
-                SchedulerBinding.instance.addPostFrameCallback((_) {
-                  setState(() {
-                    viewport = Rect.fromLTWH(-size.width / 2, -size.height / 2,
-                        size.width, size.height);
-                  });
+                setState(() {
+                  viewport = Rect.fromLTWH(-size.width / 2, -size.height / 2,
+                      size.width, size.height);
                 });
               },
             ),

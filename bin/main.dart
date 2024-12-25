@@ -54,7 +54,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       body: Center(
         child: GameWidget(components: [
-          [PathComponent(polyline)],
+          [PathComponent(polyline.segments)],
         ]),
         /*child: VectorCanvas(layers: [
           VectorLayer([polyline],
