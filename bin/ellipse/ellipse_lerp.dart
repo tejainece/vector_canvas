@@ -40,10 +40,10 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
   }
 
-  double t = 0;
   double rotation = 0;
   var center = P(0, 0);
   var radii = P(100, 80);
+  double t = 0;
 
   @override
   Widget build(BuildContext context) {

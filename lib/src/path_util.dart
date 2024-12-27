@@ -19,14 +19,14 @@ extension SegmentsPathExt on Iterable<Segment> {
             segment.c.x, segment.c.y, segment.p2.x, segment.p2.y);
       } else if (segment is ArcSegment) {
         path.arcToPoint(segment.p2.o,
-            rotation: segment.rotation,
+            rotation: segment.rotation.toDegree,
             largeArc: segment.largeArc,
-            clockwise: segment.clockwise,
+            clockwise: !segment.clockwise,
             radius: segment.radii.r);
       } else if (segment is CircularArcSegment) {
         path.arcToPoint(segment.p2.o,
             largeArc: segment.largeArc,
-            clockwise: segment.clockwise,
+            clockwise: !segment.clockwise,
             radius: Radius.circular(segment.radius));
       } else {
         throw UnimplementedError('${segment.runtimeType}');
@@ -52,7 +52,7 @@ extension CircularArcSegmentPathExt on CircularArcSegment {
     ..arcToPoint(p2.o,
         radius: Radius.circular(radius),
         largeArc: largeArc,
-        clockwise: clockwise);
+        clockwise: !clockwise);
 }
 
 extension ArcSegmentPathExt on ArcSegment {
@@ -62,7 +62,7 @@ extension ArcSegmentPathExt on ArcSegment {
         radius: radii.r,
         rotation: rotation.toDegree,
         largeArc: largeArc,
-        clockwise: clockwise);
+        clockwise: !clockwise);
 }
 
 extension QuadraticSegmentPathExt on QuadraticSegment {

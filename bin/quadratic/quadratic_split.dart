@@ -45,23 +45,27 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return Scaffold(
       body: Center(
-        child: GameWidget(color: Colors.white, components: [
-          [
-            PathComponent(quadratic.segments, stroke: Stroke(strokeWidth: 5)),
-            PathComponent(quadraticSplit.segments,
-                stroke: Stroke(strokeWidth: 3, color: Colors.red)),
-          ],
-          [
-            VerticesComponent(
-              quadratic.segments,
-              vertexPainter:
-                  CircularVertexPainter(12, fill: Fill(color: Colors.blue)),
-            ),
-            VerticesComponent(quadraticSplit.segments,
-                vertexPainter:
-                    CircularVertexPainter(10, fill: Fill(color: Colors.red))),
-          ],
-        ]),
+        child: GameWidget(
+            transformer: originToCenterWith(),
+            color: Colors.white,
+            components: [
+              [
+                PathComponent(quadratic.segments,
+                    stroke: Stroke(strokeWidth: 5)),
+                PathComponent(quadraticSplit.segments,
+                    stroke: Stroke(strokeWidth: 3, color: Colors.red)),
+              ],
+              [
+                VerticesComponent(
+                  quadratic.segments,
+                  vertexPainter:
+                      CircularVertexPainter(12, fill: Fill(color: Colors.blue)),
+                ),
+                VerticesComponent(quadraticSplit.segments,
+                    vertexPainter: CircularVertexPainter(10,
+                        fill: Fill(color: Colors.red))),
+              ],
+            ]),
       ),
     );
   }
