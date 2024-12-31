@@ -47,15 +47,15 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final center = P(200, 200);
-    final clockwise = startAngle < endAngle;
+    final center = P(0, 0);
+    final clockwise = startAngle > endAngle;
     final largeArc =
         Radian((endAngle - startAngle).abs().toRadian) > Radian(pi);
     final arc = CircularArcSegment(
         pointOnCircle(startAngle.toRadian, radius, center),
         pointOnCircle(endAngle.toRadian, radius, center),
         radius,
-        clockwise: startAngle < endAngle,
+        clockwise: clockwise,
         largeArc: largeArc);
     final arcA = CircularArcSegment(
         pointOnCircle(startAngle.toRadian, radius, center),
@@ -95,25 +95,41 @@ class _MyHomePageState extends State<MyHomePage> {
             ],
           ),
           Expanded(
-            child: GameWidget(color: Colors.white, components: [
-              [
-                SegmentsComponent([arc], stroke: Stroke(strokeWidth: 7)),
-                SegmentsComponent([arcA]),
-                SegmentsComponent([arcB], stroke: Stroke(color: Colors.orange)),
-                SegmentsComponent([arcC], stroke: Stroke(color: Colors.blue)),
-                SegmentsComponent([arc1],
-                    stroke: Stroke(strokeWidth: 3, color: Colors.blue)),
-                SegmentsComponent([arc2],
-                    stroke: Stroke(strokeWidth: 3, color: Colors.orange)),
+            child: GameWidget(
+              color: Colors.white,
+              transformer: originToCenter,
+              components: [
+                [
+                  AxisComponent(viewport),
+                ],
+                [
+                  SegmentsComponent([arc], stroke: Stroke(strokeWidth: 7)),
+                  SegmentsComponent([arcA]),
+                  SegmentsComponent([arcB],
+                      stroke: Stroke(color: Colors.orange)),
+                  SegmentsComponent([arcC], stroke: Stroke(color: Colors.blue)),
+                  SegmentsComponent([arc1],
+                      stroke: Stroke(strokeWidth: 3, color: Colors.blue)),
+                  SegmentsComponent([arc2],
+                      stroke: Stroke(strokeWidth: 3, color: Colors.orange)),
+                ],
+                [
+                  PointsComponent([pointBf.o],
+                      vertexPainter: CircularVertexPainter(7)),
+                ],
               ],
-              [
-                PointsComponent([pointBf.o],
-                    vertexPainter: CircularVertexPainter(7)),
-              ],
-            ]),
+              onResize: (size) {
+                setState(() {
+                  viewport = Rect.fromLTWH(-size.width / 2, -size.height / 2,
+                      size.width, size.height);
+                });
+              },
+            ),
           ),
         ],
       ),
     );
   }
+
+  Rect viewport = Rect.fromLTWH(-200, -200, 400, 400);
 }
