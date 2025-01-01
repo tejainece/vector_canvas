@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Line.normalAt',
+      title: 'Ellipse.boundingBox',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
@@ -38,9 +38,10 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
   }
 
+  P radii = P(100, 80);
   double startAngle = 0.toRadian;
-  double endAngle = 90.toRadian;
-  P radii = P(100, 70);
+  double endAngle = 270.toRadian;
+  bool largeArc = true;
   P center = P(0, 0);
   double rotation = 0.toRadian;
 
@@ -55,7 +56,7 @@ class _MyHomePageState extends State<MyHomePage> {
       clockwise: startAngle > endAngle,
       rotation: rotation,
     );
-    final reversed = arc.reversed();
+    final bbox = arc.boundingBox;
 
     return Scaffold(
       body: Column(
@@ -70,20 +71,32 @@ class _MyHomePageState extends State<MyHomePage> {
                   (v) => setState(() => endAngle = v)),
               slider('Rotation', rotation, 0, 2 * pi,
                   (v) => setState(() => rotation = v)),
+              slider('centerX', center.x, -400, 400,
+                  (v) => setState(() => center = P(v, center.y))),
+              slider('centerY', center.y, -400, 400,
+                  (v) => setState(() => center = P(center.x, v))),
+              slider('radiusX', radii.x, 0, 400,
+                  (v) => setState(() => radii = P(v, radii.y))),
+              slider('radiusY', radii.y, 0, 400,
+                  (v) => setState(() => radii = P(radii.x, v))),
             ],
           ),
           Expanded(
             child: GameWidget(
               color: Colors.white,
-              transformer: originToCenterWith(),
+              transformer: originToCenter,
               components: [
                 [
-                  SegmentsComponent([arc], stroke: Stroke(strokeWidth: 7)),
-                  SegmentsComponent([reversed],
-                      stroke: Stroke(strokeWidth: 3, color: Colors.blue)),
                   AxisComponent(viewport),
                 ],
-                [],
+                [
+                  SegmentsComponent([arc], stroke: Stroke(strokeWidth: 3)),
+                ],
+                [
+                  RectangleComponent(bbox,
+                      fill: null,
+                      stroke: Stroke(color: Colors.blue, strokeWidth: 3)),
+                ],
               ],
               onResize: (size) {
                 setState(() {

@@ -42,20 +42,18 @@ class _MyHomePageState extends State<MyHomePage> {
   double startAngle = 0;
   double endAngle = 270;
   bool largeArc = true;
-
-  // TODO center
+  P center = P(0, 0);
 
   @override
   Widget build(BuildContext context) {
-    final center = P(200, 200);
-    final clockwise = startAngle < endAngle;
+    final clockwise = startAngle > endAngle;
     final largeArc =
         Radian((endAngle - startAngle).abs().toRadian) > Radian(pi);
     final arc = CircularArcSegment(
         pointOnCircle(startAngle.toRadian, radius, center),
         pointOnCircle(endAngle.toRadian, radius, center),
         radius,
-        clockwise: startAngle < endAngle,
+        clockwise: clockwise,
         largeArc: largeArc);
     final bbox = arc.boundingBox;
 
@@ -72,6 +70,10 @@ class _MyHomePageState extends State<MyHomePage> {
                   (value) => setState(() => startAngle = value)),
               slider('end', endAngle, 0, 360,
                   (value) => setState(() => endAngle = value)),
+              slider('centerX', center.x, -400, 400,
+                  (v) => setState(() => center = P(v, center.y))),
+              slider('centerY', center.y, -400, 400,
+                  (v) => setState(() => center = P(center.x, v))),
             ],
           ),
           Expanded(
@@ -83,10 +85,12 @@ class _MyHomePageState extends State<MyHomePage> {
                   AxisComponent(viewport),
                 ],
                 [
-                  // SegmentsComponent([arc], stroke: Stroke(strokeWidth: 3)),
+                  SegmentsComponent([arc], stroke: Stroke(strokeWidth: 3)),
                 ],
                 [
-                  // RectangleComponent(bbox),
+                  RectangleComponent(bbox,
+                      fill: null,
+                      stroke: Stroke(color: Colors.blue, strokeWidth: 3)),
                 ],
               ],
               onResize: (size) {

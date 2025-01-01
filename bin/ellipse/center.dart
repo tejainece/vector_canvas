@@ -52,12 +52,9 @@ class _MyHomePageState extends State<MyHomePage> {
       ellipse.pointAtAngle(endAngle),
       radii,
       largeArc: (startAngle - endAngle).abs() > pi || startAngle == endAngle,
-      clockwise: startAngle < endAngle,
+      clockwise: startAngle > endAngle,
       rotation: rotation,
     );
-    /*print(arc.p1);
-    print(ellipse.unitCircleTransform);
-    print(ellipse.inverseUnitCircleTransform);*/
 
     return Scaffold(
       body: Column(
@@ -87,6 +84,9 @@ class _MyHomePageState extends State<MyHomePage> {
               color: Colors.white,
               transformer: originToCenterWith(),
               components: [
+                [
+                  AxisComponent(viewport),
+                ],
                 [
                   SegmentsComponent([arc], stroke: Stroke(strokeWidth: 7)),
                 ],

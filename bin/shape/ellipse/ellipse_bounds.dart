@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:game_engine/game_engine.dart';
-import 'package:vector_canvas/src/components/axis_component.dart';
-import 'package:vector_canvas/src/components/shape/shape.dart';
 import 'package:vector_canvas/vector_canvas.dart';
 import 'package:vector_path/vector_path.dart';
 
-import '../_ui/controls.dart';
+import '../../_ui/controls.dart';
 
 void main() {
   runApp(const MyApp());
@@ -43,12 +41,12 @@ class _MyHomePageState extends State<MyHomePage> {
   double rotation = 0;
   var center = P(0, 0);
   var radii = P(100, 80);
-  double t = 0;
 
   @override
   Widget build(BuildContext context) {
     final ellipse = Ellipse(radii, center: center, rotation: rotation);
-    final point = ellipse.lerp(t).o;
+    final xBounds = ellipse.xBounds();
+    final yBounds = ellipse.yBounds();
 
     return Scaffold(
       body: Column(
@@ -57,7 +55,6 @@ class _MyHomePageState extends State<MyHomePage> {
           Wrap(
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
-              slider('t', t, 0, 1, (value) => setState(() => t = value)),
               slider('Theta', rotation, 0, 2 * pi,
                   (value) => setState(() => rotation = value)),
               slider('Center.x', center.x, -400, 400,
@@ -82,9 +79,22 @@ class _MyHomePageState extends State<MyHomePage> {
                   EllipseComponent(ellipse),
                 ],
                 [
-                  PointsComponent([point],
-                      vertexPainter: CircularVertexPainter(12,
-                          fill: Fill(color: Colors.blue))),
+                  LineComponent(
+                      LineSegment.vertical(
+                          viewport.top, viewport.bottom, xBounds.$1),
+                      stroke: Stroke(color: Colors.purple)),
+                  LineComponent(
+                      LineSegment.vertical(
+                          viewport.top, viewport.bottom, xBounds.$2),
+                      stroke: Stroke(color: Colors.purple)),
+                  LineComponent(
+                      LineSegment.horizontal(
+                          viewport.left, viewport.right, yBounds.$1),
+                      stroke: Stroke(color: Colors.purple)),
+                  LineComponent(
+                      LineSegment.horizontal(
+                          viewport.left, viewport.right, yBounds.$2),
+                      stroke: Stroke(color: Colors.purple)),
                 ],
               ],
               onResize: (size) {
