@@ -1,5 +1,13 @@
 import 'dart:ui';
 
+import 'package:vector_path/vector_path.dart';
+
+extension PExt on P {
+  Offset get o => Offset(x, y);
+
+  Radius get r => Radius.elliptical(x, y);
+}
+
 extension OffsetExt on Offset {
   bool equals(Offset other, {double epsilon = 1e-3}) {
     final diffX = (dx - other.dx).abs();

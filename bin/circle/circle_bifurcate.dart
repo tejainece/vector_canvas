@@ -52,26 +52,26 @@ class _MyHomePageState extends State<MyHomePage> {
     final largeArc =
         Radian((endAngle - startAngle).abs().toRadian) > Radian(pi);
     final arc = CircularArcSegment(
-        pointOnCircle(startAngle.toRadian, radius, center),
-        pointOnCircle(endAngle.toRadian, radius, center),
+        P.onCircle(startAngle.toRadian, radius, center),
+        P.onCircle(endAngle.toRadian, radius, center),
         radius,
         clockwise: clockwise,
         largeArc: largeArc);
     final arcA = CircularArcSegment(
-        pointOnCircle(startAngle.toRadian, radius, center),
-        pointOnCircle(endAngle.toRadian, radius, center),
+        P.onCircle(startAngle.toRadian, radius, center),
+        P.onCircle(endAngle.toRadian, radius, center),
         radius,
         clockwise: !clockwise,
         largeArc: largeArc);
     final arcB = CircularArcSegment(
-        pointOnCircle(startAngle.toRadian, radius, center),
-        pointOnCircle(endAngle.toRadian, radius, center),
+        P.onCircle(startAngle.toRadian, radius, center),
+        P.onCircle(endAngle.toRadian, radius, center),
         radius,
         clockwise: clockwise,
         largeArc: !largeArc);
     final arcC = CircularArcSegment(
-        pointOnCircle(startAngle.toRadian, radius, center),
-        pointOnCircle(endAngle.toRadian, radius, center),
+        P.onCircle(startAngle.toRadian, radius, center),
+        P.onCircle(endAngle.toRadian, radius, center),
         radius,
         clockwise: !clockwise,
         largeArc: !largeArc);

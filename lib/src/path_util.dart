@@ -1,6 +1,6 @@
 import 'dart:ui';
 
-import 'package:game_engine/game_engine.dart';
+import 'package:vector_canvas/vector_canvas.dart';
 import 'package:vector_path/vector_path.dart';
 
 extension SegmentsPathExt on Iterable<Segment> {

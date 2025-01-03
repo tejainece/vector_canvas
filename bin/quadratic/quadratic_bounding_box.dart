@@ -15,7 +15,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'lerp',
+      title: 'Quadratic.boundingBox',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
@@ -38,11 +38,13 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
   }
 
+  double t = 0.1;
+
   @override
   Widget build(BuildContext context) {
-    final quadratic = VectorCurve(
-        [QuadraticSegment(p1: P(100, 100), p2: P(200, 100), c: P(150, 50))]);
-    final quadraticPoint = quadratic.segments[0].lerp(t).o;
+    final quadratic =
+        QuadraticSegment(p1: P(100, 100), p2: P(200, 100), c: P(150, 50));
+    final bbox = quadratic.boundingBox;
 
     return Scaffold(
       body: Column(
@@ -57,13 +59,12 @@ class _MyHomePageState extends State<MyHomePage> {
           Expanded(
             child: GameWidget(color: Colors.white, components: [
               [
-                PathComponent(quadratic.segments,
-                    stroke: Stroke(strokeWidth: 5)),
+                SegmentsComponent([quadratic], stroke: Stroke(strokeWidth: 5)),
               ],
               [
-                PointsComponent([quadraticPoint],
-                    vertexPainter: CircularVertexPainter(12,
-                        fill: Fill(color: Colors.blue))),
+                RectangleComponent(bbox,
+                    fill: null,
+                    stroke: Stroke(color: Colors.blue, strokeWidth: 3)),
               ],
             ]),
           ),
@@ -71,6 +72,4 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
-
-  double t = 0.1;
 }
