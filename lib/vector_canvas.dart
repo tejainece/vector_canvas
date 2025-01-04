@@ -3,3 +3,4 @@ export 'src/paint.dart';
 export 'src/path_util.dart';
 export 'src/util.dart';
 export 'src/components/shape/shape.dart';
+export 'src/components/control/control.dart';
