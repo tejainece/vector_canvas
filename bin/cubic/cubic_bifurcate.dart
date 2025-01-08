@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:game_engine/game_engine.dart';
 import 'package:vector_canvas/vector_canvas.dart';
 import 'package:vector_path/vector_path.dart';
 
@@ -47,21 +46,19 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return Scaffold(
       body: Center(
-        child: GameWidget(color: Colors.white, components: [
-          [
-            PathComponent(cubic.segments, stroke: Stroke(strokeWidth: 5)),
-            PathComponent(cubicSplit.segments,
-                stroke: Stroke(strokeWidth: 3, color: Colors.red)),
-          ],
-          [
-            VerticesComponent(cubic.segments,
-                vertexPainter:
-                    CircularVertexPainter(12, fill: Fill(color: Colors.blue))),
-            VerticesComponent(cubicSplit.segments,
-                vertexPainter:
-                    CircularVertexPainter(10, fill: Fill(color: Colors.red))),
-          ],
-        ]),
+        child: GameWidget(
+            color: Colors.white,
+            component: LayerComponent([
+              PathComponent(cubic.segments, stroke: Stroke(strokeWidth: 5)),
+              PathComponent(cubicSplit.segments,
+                  stroke: Stroke(strokeWidth: 3, color: Colors.red)),
+              VerticesComponent(cubic.segments,
+                  vertexPainter: CircularVertexPainter(12,
+                      fill: Fill(color: Colors.blue))),
+              VerticesComponent(cubicSplit.segments,
+                  vertexPainter:
+                      CircularVertexPainter(10, fill: Fill(color: Colors.red))),
+            ])),
       ),
     );
   }

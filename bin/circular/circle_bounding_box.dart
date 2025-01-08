@@ -1,5 +1,6 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
-import 'package:game_engine/game_engine.dart';
 import 'package:vector_canvas/vector_canvas.dart';
 import 'package:vector_path/vector_path.dart';
 
@@ -80,23 +81,17 @@ class _MyHomePageState extends State<MyHomePage> {
             child: GameWidget(
               color: Colors.white,
               transformer: originToCenter,
-              components: [
-                [
-                  AxisComponent(viewport),
-                ],
-                [
-                  SegmentsComponent([arc], stroke: Stroke(strokeWidth: 3)),
-                ],
-                [
-                  RectangleComponent(bbox,
-                      fill: null,
-                      stroke: Stroke(color: Colors.blue, strokeWidth: 3)),
-                ],
-              ],
+              component: LayerComponent([
+                AxisComponent(viewport),
+                SegmentsComponent([arc], stroke: Stroke(strokeWidth: 3)),
+                RectangleComponent(bbox,
+                    fill: null,
+                    stroke: Stroke(color: Colors.blue, strokeWidth: 3)),
+              ]),
               onResize: (size) {
                 setState(() {
-                  viewport = Rect.fromLTWH(-size.width / 2, -size.height / 2,
-                      size.width, size.height);
+                  viewport = R(-size.width / 2, -size.height / 2, size.width,
+                      size.height);
                 });
               },
             ),
@@ -106,5 +101,5 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Rect viewport = Rect.fromLTWH(-200, -200, 400, 400);
+  R viewport = R(-200, -200, 400, 400);
 }

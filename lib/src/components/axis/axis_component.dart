@@ -1,20 +1,19 @@
 import 'dart:ui';
 
-import 'package:flutter/gestures.dart';
-import 'package:game_engine/game_engine.dart';
 import 'package:vector_canvas/vector_canvas.dart';
 import 'package:vector_path/vector_path.dart';
 
-class AxisComponent extends Component {
-  Rect _rect;
+class AxisComponent extends Component implements NeedsDetach {
+  R _rect;
 
   Stroke _xAxisStroke;
   Stroke _yAxisStroke;
 
-  AxisComponent(this._rect,
-      {Stroke xAxisStroke = const Stroke(),
-      Stroke yAxisStroke = const Stroke()})
-      : _xAxisStroke = xAxisStroke,
+  AxisComponent(
+    this._rect, {
+    Stroke xAxisStroke = const Stroke(),
+    Stroke yAxisStroke = const Stroke(),
+  })  : _xAxisStroke = xAxisStroke,
         _yAxisStroke = yAxisStroke {
     _compute();
   }
@@ -28,27 +27,7 @@ class AxisComponent extends Component {
     }
   }
 
-  @override
-  void tick(TickCtx ctx) {
-    for (var child in _children) {
-      child.tick(ctx);
-    }
-
-    if (!_dirty) return;
-    ctx.shouldRender();
-    _dirty = false;
-  }
-
-  @override
-  void handlePointerEvent(PointerEvent event) {
-    for (var child in _children) {
-      child.handlePointerEvent(event);
-    }
-  }
-
-  bool _dirty = true;
-
-  void set({Rect? rect, Stroke? xAxisStroke, Stroke? yAxisStroke}) {
+  void set({R? rect, Stroke? xAxisStroke, Stroke? yAxisStroke}) {
     bool needsUpdate = false;
     if (rect != null) {
       if (rect != _rect) {
@@ -70,7 +49,7 @@ class AxisComponent extends Component {
       }
     }
     if (needsUpdate) {
-      _dirty = true;
+      _ctx?.requestRender(this);
     }
   }
 
@@ -78,21 +57,44 @@ class AxisComponent extends Component {
   double _yAxisIntercept = 0;
 
   void _compute() {
+    for (final component in _children) {
+      _ctx?.unregisterComponent(component);
+    }
     final children = <Component>[];
     if (_rect.top < _xAxisIntercept && _rect.bottom > _xAxisIntercept) {
       children.add(LineComponent(
           LineSegment(
               P(_rect.left, _xAxisIntercept), P(_rect.right, _xAxisIntercept)),
           stroke: _xAxisStroke));
-      // TODO ticks
     }
     if (_rect.left < 0 && _rect.right > 0) {
+      print('v => $_rect ${_rect.top} ${_rect.bottom}');
       children.add(LineComponent(
           LineSegment(
-              P(_yAxisIntercept, _rect.top), P(_yAxisIntercept, _rect.bottom)),
+              P(_yAxisIntercept, -_rect.top), P(_yAxisIntercept, -_rect.bottom)),
           stroke: _yAxisStroke));
-      // TODO ticks
     }
     _children = children;
+    for (final component in _children) {
+      _ctx?.registerComponent(component);
+    }
+  }
+
+  ComponentContext? _ctx;
+
+  @override
+  void onAttach(ComponentContext ctx) {
+    _ctx = ctx;
+    for (final child in _children) {
+      _ctx?.registerComponent(child);
+    }
+  }
+
+  @override
+  void onDetach(ComponentContext ctx) {
+    for (final child in _children) {
+      _ctx?.unregisterComponent(child);
+    }
+    _ctx = null;
   }
 }

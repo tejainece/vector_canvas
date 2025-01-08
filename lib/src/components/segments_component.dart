@@ -15,20 +15,11 @@ class SegmentsComponent implements Component {
         _stroke = stroke,
         _paint = stroke.paint;
 
-  bool _dirty = true;
-
   @override
   void render(Canvas canvas) {
     for (final segment in _segments) {
       canvas.drawPath(segment.path, _paint);
     }
-  }
-
-  @override
-  void tick(TickCtx ctx) {
-    if (!_dirty) return;
-    ctx.shouldRender();
-    _dirty = false;
   }
 
   void set({Iterable<Segment>? segments, Stroke? stroke}) {
@@ -46,12 +37,16 @@ class SegmentsComponent implements Component {
         needsUpdate = true;
       }
     }
-    _dirty = _dirty || needsUpdate;
+    if (needsUpdate) {
+      _ctx?.requestRender(this);
+    }
   }
 
+  ComponentContext? _ctx;
+
   @override
-  void handlePointerEvent(PointerEvent event) {
-    // TODO
+  void onAttach(ComponentContext ctx) {
+    _ctx = ctx;
   }
 }
 
@@ -70,15 +65,6 @@ class LineComponent extends Component {
     canvas.drawLine(_line.p1.o, _line.p2.o, _strokePaint);
   }
 
-  @override
-  void tick(TickCtx ctx) {
-    if (!_dirty) return;
-    ctx.shouldRender();
-    _dirty = false;
-  }
-
-  bool _dirty = true;
-
   void set({LineSegment? line, Stroke? stroke}) {
     bool needsUpdate = false;
     if (line != null) {
@@ -92,11 +78,15 @@ class LineComponent extends Component {
         needsUpdate = true;
       }
     }
-    _dirty = _dirty || needsUpdate;
+    if (needsUpdate) {
+      _ctx?.requestRender(this);
+    }
   }
 
+  ComponentContext? _ctx;
+
   @override
-  void handlePointerEvent(PointerEvent event) {
-    // TODO: implement handlePointerEvent
+  void onAttach(ComponentContext ctx) {
+    _ctx = ctx;
   }
 }

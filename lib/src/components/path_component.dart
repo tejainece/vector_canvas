@@ -31,19 +31,10 @@ class PathComponent implements Component {
     }
   }
 
-  @override
-  void tick(TickCtx ctx) {
-    if (!_dirty) return;
-    ctx.shouldRender();
-    _dirty = false;
-  }
-
-  bool _dirty = true;
-
   void set(
       {Iterable<Segment>? segments,
-      Optional<Fill>? fill,
-      Optional<Stroke>? stroke}) {
+      Argument<Fill>? fill,
+      Argument<Stroke>? stroke}) {
     bool needsUpdate = false;
     if (segments != null) {
       if (!segments.isSame(_segments)) {
@@ -66,11 +57,15 @@ class PathComponent implements Component {
         needsUpdate = true;
       }
     }
-    _dirty = _dirty || needsUpdate;
+    if (needsUpdate) {
+      _ctx?.requestRender(this);
+    }
   }
 
+  ComponentContext? _ctx;
+
   @override
-  void handlePointerEvent(PointerEvent event) {
-    // TODO
+  void onAttach(ComponentContext ctx) {
+    _ctx = ctx;
   }
 }

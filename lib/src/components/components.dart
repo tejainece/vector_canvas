@@ -1,5 +1,4 @@
 export 'angle_component.dart';
-export 'axis_component.dart';
 export 'path_component.dart';
 export 'points_component.dart';
 export 'segments_component.dart';

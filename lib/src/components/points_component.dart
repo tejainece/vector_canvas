@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:game_engine/game_engine.dart';
 import 'package:vector_canvas/src/components/vertices_component.dart';
-import 'package:vector_canvas/src/util.dart';
+import 'package:vector_path/vector_path.dart';
 
 class PointsComponent extends Component {
-  List<Offset> _points;
+  List<P> _points;
   VertexPainter _vertexPainter;
 
-  PointsComponent(Iterable<Offset> points,
+  PointsComponent(Iterable<P> points,
       {VertexPainter vertexPainter = const CircularVertexPainter(5)})
       : _points = points.toList(),
         _vertexPainter = vertexPainter;
@@ -19,19 +19,10 @@ class PointsComponent extends Component {
     }
   }
 
-  bool _dirty = true;
-
-  @override
-  void tick(TickCtx ctx) {
-    if (!_dirty) return;
-    ctx.shouldRender();
-    _dirty = false;
-  }
-
-  void set({Iterable<Offset>? points, VertexPainter? vertexPainter}) {
+  void set({Iterable<P>? points, VertexPainter? vertexPainter}) {
     bool needsUpdate = false;
     if (points != null) {
-      if (!points.isSame(_points)) {
+      if (!points.equals(_points)) {
         _points = points.toList();
         needsUpdate = true;
       }
@@ -42,11 +33,15 @@ class PointsComponent extends Component {
         needsUpdate = true;
       }
     }
-    _dirty = _dirty || needsUpdate;
+    if (needsUpdate) {
+      _ctx?.requestRender(this);
+    }
   }
 
+  ComponentContext? _ctx;
+
   @override
-  void handlePointerEvent(PointerEvent event) {
-    // TODO
+  void onAttach(ComponentContext ctx) {
+    _ctx = ctx;
   }
 }

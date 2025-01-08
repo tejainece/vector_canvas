@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:game_engine/game_engine.dart';
 import 'package:vector_canvas/vector_canvas.dart';
 import 'package:vector_path/vector_path.dart';
 
@@ -69,16 +68,15 @@ class _MyHomePageState extends State<MyHomePage> {
             ],
           ),
           Expanded(
-            child: GameWidget(color: Colors.white, components: [
-              [
+            child: GameWidget(
+              color: Colors.white,
+              component: LayerComponent([
                 SegmentsComponent([cubic], stroke: Stroke(strokeWidth: 5)),
-              ],
-              [
                 RectangleComponent(bbox,
                     fill: null,
                     stroke: Stroke(color: Colors.blue, strokeWidth: 3)),
-              ],
-            ]),
+              ]),
+            ),
           ),
         ],
       ),

@@ -1,11 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:game_engine/game_engine.dart';
 import 'package:vector_canvas/vector_canvas.dart';
 import 'package:vector_path/vector_path.dart';
 
 class PointControlComponent extends Component
-    implements CanHitTest, NeedsDetach {
+    implements CanHitTest, NeedsDetach, PointerEventHandler {
   final ControlData? controlData;
 
   P _point;
@@ -52,16 +51,6 @@ class PointControlComponent extends Component
     }
   }
 
-  bool _dirty = true;
-
-  @override
-  void tick(TickCtx ctx) {
-    ctx.registerDetach(this);
-    if (!_dirty) return;
-    ctx.shouldRender();
-    _dirty = false;
-  }
-
   Circle _circle = Circle();
   Affine2d _transform = Affine2d();
 
@@ -69,10 +58,10 @@ class PointControlComponent extends Component
       {P? point,
       double? radius,
       bool? selected,
-      Optional<Stroke>? stroke,
-      Optional<Fill>? fill,
-      Optional<Stroke>? selectedStroke,
-      Optional<Fill>? selectedFill}) {
+      Argument<Stroke>? stroke,
+      Argument<Fill>? fill,
+      Argument<Stroke>? selectedStroke,
+      Argument<Fill>? selectedFill}) {
     bool needsUpdate = false;
     if (point != null) {
       if (!_point.isEqual(point)) {
@@ -123,7 +112,7 @@ class PointControlComponent extends Component
     }
 
     if (needsUpdate) {
-      _dirty = true;
+      _ctx?.requestRender(this);
     }
   }
 
@@ -139,18 +128,23 @@ class PointControlComponent extends Component
 
   @override
   void handlePointerEvent(PointerEvent event) {
-    if (!hitTest(event.localPosition)) {
+    if (!hitTest(event.position)) {
       return;
     }
     _tapDetector.handlePointerEvent(event);
   }
 
   @override
-  bool hitTest(Offset point) => _circle
-      .containsPoint(P(point.dx, point.dy).transform(_transform.inverse()));
+  bool hitTest(Offset point) {
+    P p = P(point.dx, point.dy).transform(_transform.inverse());
+    return _circle.containsPoint(p);
+  }
+
+  ComponentContext? _ctx;
 
   @override
-  void onAttach() {
+  void onAttach(ComponentContext ctx) {
+    _ctx = ctx;
     controlData?.controls.addChangedListener(this, () {
       bool selected = controlData!.isSelected;
       set(selected: selected);
@@ -158,7 +152,7 @@ class PointControlComponent extends Component
   }
 
   @override
-  void onDetach() {
+  void onDetach(ComponentContext ctx) {
     controlData?.controls.removeChangedListener(this);
   }
 }

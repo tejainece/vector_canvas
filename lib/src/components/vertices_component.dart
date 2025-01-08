@@ -15,19 +15,10 @@ class VerticesComponent extends Component {
   @override
   void render(Canvas canvas) {
     if (_segments.isEmpty) return;
-    _vertexPainter.paint(canvas, _segments.first.p1.o);
+    _vertexPainter.paint(canvas, _segments.first.p1);
     for (final segment in _segments) {
-      _vertexPainter.paint(canvas, segment.p2.o);
+      _vertexPainter.paint(canvas, segment.p2);
     }
-  }
-
-  bool _dirty = true;
-
-  @override
-  void tick(TickCtx ctx) {
-    if (!_dirty) return;
-    ctx.shouldRender();
-    _dirty = false;
   }
 
   void set({Iterable<Segment>? segments, VertexPainter? vertexPainter}) {
@@ -44,19 +35,23 @@ class VerticesComponent extends Component {
         needsUpdate = true;
       }
     }
-    _dirty = _dirty || needsUpdate;
+    if (needsUpdate) {
+      _ctx?.requestRender(this);
+    }
   }
 
+  ComponentContext? _ctx;
+
   @override
-  void handlePointerEvent(PointerEvent event) {
-    // TODO
+  void onAttach(ComponentContext ctx) {
+    _ctx = ctx;
   }
 }
 
 abstract class VertexPainter {
   const VertexPainter();
 
-  void paint(Canvas canvas, Offset point);
+  void paint(Canvas canvas, P point);
 }
 
 class CircularVertexPainter extends VertexPainter {
@@ -68,12 +63,12 @@ class CircularVertexPainter extends VertexPainter {
       {this.stroke, this.fill = const Fill(color: Colors.blue)});
 
   @override
-  void paint(Canvas canvas, Offset point) {
+  void paint(Canvas canvas, P point) {
     if (fill != null) {
-      canvas.drawCircle(point, radius, fill!.paint);
+      canvas.drawCircle(point.o, radius, fill!.paint);
     }
     if (stroke != null) {
-      canvas.drawCircle(point, radius, stroke!.paint);
+      canvas.drawCircle(point.o, radius, stroke!.paint);
     }
   }
 }

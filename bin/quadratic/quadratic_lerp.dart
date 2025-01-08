@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:game_engine/game_engine.dart';
 import 'package:vector_canvas/vector_canvas.dart';
 import 'package:vector_path/vector_path.dart';
 
@@ -44,7 +43,7 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     final quadratic = VectorCurve(
         [QuadraticSegment(p1: P(100, 100), p2: P(200, 100), c: P(150, 50))]);
-    final quadraticPoint = quadratic.segments[0].lerp(t).o;
+    final quadraticPoint = quadratic.segments[0].lerp(t);
 
     return Scaffold(
       body: Column(
@@ -57,17 +56,15 @@ class _MyHomePageState extends State<MyHomePage> {
             ],
           ),
           Expanded(
-            child: GameWidget(color: Colors.white, components: [
-              [
-                PathComponent(quadratic.segments,
-                    stroke: Stroke(strokeWidth: 5)),
-              ],
-              [
-                PointsComponent([quadraticPoint],
-                    vertexPainter: CircularVertexPainter(12,
-                        fill: Fill(color: Colors.blue))),
-              ],
-            ]),
+            child: GameWidget(
+                color: Colors.white,
+                component: LayerComponent([
+                  PathComponent(quadratic.segments,
+                      stroke: Stroke(strokeWidth: 5)),
+                  PointsComponent([quadraticPoint],
+                      vertexPainter: CircularVertexPainter(12,
+                          fill: Fill(color: Colors.blue))),
+                ])),
           ),
         ],
       ),

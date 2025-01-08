@@ -4,38 +4,31 @@ import 'dart:ui';
 import 'package:flutter/gestures.dart';
 import 'package:game_engine/game_engine.dart';
 
-class TransformComponent implements Component {
-  List<Component> _children;
+class TransformComponent implements Component, NeedsDetach {
+  List<Component> _children = [];
   Float64List _matrix;
 
-  TransformComponent(this._children, this._matrix);
+  TransformComponent(List<Component> children, this._matrix) {
+    _updateChildren(children);
+  }
 
   @override
   void render(Canvas canvas) {
     canvas.save();
-    canvas.transform(_matrix);
-    for (var child in _children) {
-      child.render(canvas);
+    try {
+      canvas.transform(_matrix);
+      for (var child in _children) {
+        child.render(canvas);
+      }
+    } finally {
+      canvas.restore();
     }
-    canvas.restore();
   }
 
-  bool _dirty = true;
-
-  @override
-  void tick(TickCtx ctx) {
-    for (var child in _children) {
-      child.tick(ctx);
-    }
-    if (!_dirty) return;
-    ctx.shouldRender();
-    _dirty = false;
-  }
-
-  void set({Iterable<Component>? children, Float64List? matrix}) {
+  void set({List<Component>? children, Float64List? matrix}) {
     bool needsUpdate = false;
-    if (children != null) {
-      _children = children.toList();
+    if (children != null && !Component.compareChildren(children, _children)) {
+      _updateChildren(children);
       needsUpdate = true;
     }
     if (matrix != null) {
@@ -43,58 +36,62 @@ class TransformComponent implements Component {
       needsUpdate = true;
     }
     if (needsUpdate) {
-      _dirty = true;
+      _ctx?.requestRender(this);
+    }
+  }
+
+  Set<Component> _childrenSet = <Component>{};
+
+  void _updateChildren(List<Component> children) {
+    _childrenSet = Component.updateChildren(_childrenSet, children, _ctx);
+    _children = children.toList();
+  }
+
+  ComponentContext? _ctx;
+
+  @override
+  void onAttach(ComponentContext ctx) {
+    _ctx = ctx;
+    for (var child in _children) {
+      _ctx?.registerComponent(child);
     }
   }
 
   @override
-  void handlePointerEvent(PointerEvent event) {
+  void onDetach(ComponentContext ctx) {
     for (var child in _children) {
-      child.handlePointerEvent(event);
+      _ctx?.unregisterComponent(child);
     }
+    _ctx = null;
   }
 }
 
-class OriginToCenterComponent extends Component {
-  List<Component> _children;
+class OriginToCenterComponent implements Component, NeedsDetach {
+  List<Component> _children = [];
   Size _size;
 
-  OriginToCenterComponent(this._children, this._size);
+  OriginToCenterComponent(List<Component> children, this._size) {
+    _updateChildren(children);
+  }
 
   @override
   void render(Canvas canvas) {
     canvas.save();
-    canvas.translate(_size.width / 2, _size.height / 2);
-    canvas.scale(1, -1);
-    for (var child in _children) {
-      child.render(canvas);
-    }
-    canvas.restore();
-  }
-
-  bool _dirty = true;
-
-  @override
-  void tick(TickCtx ctx) {
-    for (var child in _children) {
-      child.tick(ctx);
-    }
-    if (!_dirty) return;
-    _dirty = false;
-    ctx.shouldRender();
-  }
-
-  @override
-  void handlePointerEvent(PointerEvent event) {
-    for (var child in _children) {
-      child.handlePointerEvent(event);
+    try {
+      canvas.translate(_size.width / 2, _size.height / 2);
+      canvas.scale(1, -1);
+      for (var child in _children) {
+        child.render(canvas);
+      }
+    } finally {
+      canvas.restore();
     }
   }
 
-  void set({Iterable<Component>? children, Size? size}) {
+  void set({List<Component>? children, Size? size}) {
     bool needsUpdate = false;
-    if (children != null) {
-      _children = children.toList();
+    if (children != null && !Component.compareChildren(children, _children)) {
+      _updateChildren(children);
       needsUpdate = true;
     }
     if (size != null) {
@@ -104,7 +101,32 @@ class OriginToCenterComponent extends Component {
       }
     }
     if (needsUpdate) {
-      _dirty = true;
+      _ctx?.requestRender(this);
     }
+  }
+
+  Set<Component> _childrenSet = <Component>{};
+
+  void _updateChildren(List<Component> children) {
+    _childrenSet = Component.updateChildren(_childrenSet, children, _ctx);
+    _children = children.toList();
+  }
+
+  ComponentContext? _ctx;
+
+  @override
+  void onAttach(ComponentContext ctx) {
+    _ctx = ctx;
+    for (var child in _children) {
+      _ctx?.registerComponent(child);
+    }
+  }
+
+  @override
+  void onDetach(ComponentContext ctx) {
+    for (var child in _children) {
+      _ctx?.unregisterComponent(child);
+    }
+    _ctx = null;
   }
 }

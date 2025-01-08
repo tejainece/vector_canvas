@@ -1,5 +1,6 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
-import 'package:game_engine/game_engine.dart';
 import 'package:vector_canvas/vector_canvas.dart';
 import 'package:vector_path/vector_path.dart';
 
@@ -44,7 +45,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    print(rotation);
     final ellipse = Ellipse(radii, center: center, rotation: 0);
     final angles = <double>[
       0,
@@ -55,10 +55,10 @@ class _MyHomePageState extends State<MyHomePage> {
       5 * pi / 3,
     ];
     final points =
-        angles.map((a) => ellipse.pointAtAngle(a)).map((p) => p.o).toList();
+    angles.map((a) => ellipse.pointAtAngle(a));
     final ellipse2 = Ellipse(radii, center: center, rotation: rotation);
     final points2 =
-        angles.map((a) => ellipse2.pointAtAngle(a)).map((p) => p.o).toList();
+    angles.map((a) => ellipse2.pointAtAngle(a));
 
     return Scaffold(
       body: Column(
@@ -68,7 +68,7 @@ class _MyHomePageState extends State<MyHomePage> {
             crossAxisAlignment: WrapCrossAlignment.center,
             children: [
               slider('Rotation', rotation, 0, 2 * pi,
-                  (v) => setState(() => rotation = v)),
+                      (v) => setState(() => rotation = v)),
               // TODO
             ],
           ),
@@ -76,21 +76,18 @@ class _MyHomePageState extends State<MyHomePage> {
             child: GameWidget(
               color: Colors.white,
               transformer: originToCenterWith(),
-              components: [
-                [
-                  PointsComponent(points,
-                      vertexPainter: CircularVertexPainter(10,
-                          fill: Fill(color: Colors.blue))),
-                  PointsComponent(points2,
-                      vertexPainter: CircularVertexPainter(5,
-                          fill: Fill(color: Colors.red))),
-                ],
-                [],
-              ],
+              component: LayerComponent([
+                PointsComponent(points,
+                    vertexPainter: CircularVertexPainter(10,
+                        fill: Fill(color: Colors.blue))),
+                PointsComponent(points2,
+                    vertexPainter: CircularVertexPainter(5,
+                        fill: Fill(color: Colors.red))),
+              ]),
               onResize: (size) {
                 setState(() {
-                  viewport = Rect.fromLTWH(-size.width / 2, -size.height / 2,
-                      size.width, size.height);
+                  viewport = R(-size.width / 2, -size.height / 2, size.width,
+                      size.height);
                 });
               },
             ),
@@ -100,5 +97,5 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Rect viewport = Rect.fromLTWH(-200, -200, 400, 400);
+  R viewport = R(-200, -200, 400, 400);
 }

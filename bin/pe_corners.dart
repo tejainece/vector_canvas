@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:game_engine/game_engine.dart';
 import 'package:vector_canvas/vector_canvas.dart';
 import 'package:vector_path/vector_path.dart';
 
@@ -92,16 +91,15 @@ class _MyHomePageState extends State<MyHomePage> {
             ],
           ),
           Expanded(
-            child: GameWidget(color: Colors.white, components: [
-              [
+            child: GameWidget(
+              color: Colors.white,
+              component: LayerComponent([
                 PathComponent(polyLine.segments,
                     stroke: Stroke(strokeWidth: 5)),
-              ],
-              [
                 AnglesComponent([line1, line2],
                     piePainter: Fill(color: Colors.purple)),
-              ],
-            ]),
+              ]),
+            ),
           ),
         ],
       ),

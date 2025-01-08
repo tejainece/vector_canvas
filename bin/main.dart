@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:game_engine/game_engine.dart';
 import 'package:vector_canvas/vector_canvas.dart';
 import 'package:vector_path/vector_path.dart';
 
@@ -53,9 +52,10 @@ class _MyHomePageState extends State<MyHomePage> {
 
     return Scaffold(
       body: Center(
-        child: GameWidget(components: [
-          [PathComponent(polyline.segments)],
-        ]),
+        child: GameWidget(
+            component: LayerComponent([
+          PathComponent(polyline.segments),
+        ])),
         /*child: VectorCanvas(layers: [
           VectorLayer([polyline],
               paint: Paint()

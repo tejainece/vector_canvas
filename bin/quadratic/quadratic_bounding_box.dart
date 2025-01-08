@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:game_engine/game_engine.dart';
 import 'package:vector_canvas/vector_canvas.dart';
 import 'package:vector_path/vector_path.dart';
 
@@ -43,7 +42,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     final quadratic =
-        QuadraticSegment(p1: P(100, 100), p2: P(200, 100), c: P(150, 50));
+    QuadraticSegment(p1: P(100, 100), p2: P(200, 100), c: P(150, 50));
     final bbox = quadratic.boundingBox;
 
     return Scaffold(
@@ -57,16 +56,12 @@ class _MyHomePageState extends State<MyHomePage> {
             ],
           ),
           Expanded(
-            child: GameWidget(color: Colors.white, components: [
-              [
-                SegmentsComponent([quadratic], stroke: Stroke(strokeWidth: 5)),
-              ],
-              [
-                RectangleComponent(bbox,
-                    fill: null,
-                    stroke: Stroke(color: Colors.blue, strokeWidth: 3)),
-              ],
-            ]),
+            child: GameWidget(color: Colors.white, component: LayerComponent([
+              SegmentsComponent([quadratic], stroke: Stroke(strokeWidth: 5)),
+              RectangleComponent(bbox,
+                  fill: null,
+                  stroke: Stroke(color: Colors.blue, strokeWidth: 3)),
+            ]),),
           ),
         ],
       ),

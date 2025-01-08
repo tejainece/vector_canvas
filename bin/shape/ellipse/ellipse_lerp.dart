@@ -1,5 +1,6 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
-import 'package:game_engine/game_engine.dart';
 import 'package:vector_canvas/vector_canvas.dart';
 import 'package:vector_path/vector_path.dart';
 
@@ -46,7 +47,7 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     final ellipse = Ellipse(radii, center: center, rotation: rotation);
-    final point = ellipse.lerp(t).o;
+    final point = ellipse.lerp(t);
 
     return Scaffold(
       body: Column(
@@ -72,23 +73,17 @@ class _MyHomePageState extends State<MyHomePage> {
             child: GameWidget(
               color: Colors.white,
               transformer: originToCenter,
-              components: [
-                [
-                  AxisComponent(viewport),
-                ],
-                [
-                  EllipseComponent(ellipse),
-                ],
-                [
-                  PointsComponent([point],
-                      vertexPainter: CircularVertexPainter(12,
-                          fill: Fill(color: Colors.blue))),
-                ],
-              ],
+              component: LayerComponent([
+                AxisComponent(viewport),
+                EllipseComponent(ellipse),
+                PointsComponent([point],
+                    vertexPainter: CircularVertexPainter(12,
+                        fill: Fill(color: Colors.blue))),
+              ]),
               onResize: (size) {
                 setState(() {
-                  viewport = Rect.fromLTWH(-size.width / 2, -size.height / 2,
-                      size.width, size.height);
+                  viewport = R(-size.width / 2, -size.height / 2, size.width,
+                      size.height);
                 });
               },
             ),
@@ -98,5 +93,5 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Rect viewport = Rect.fromLTWH(-200, -200, 400, 400);
+  R viewport = R(-200, -200, 400, 400);
 }

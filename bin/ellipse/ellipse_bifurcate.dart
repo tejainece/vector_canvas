@@ -1,5 +1,6 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
-import 'package:game_engine/game_engine.dart';
 import 'package:vector_canvas/vector_canvas.dart';
 import 'package:vector_path/vector_path.dart';
 
@@ -89,33 +90,27 @@ class _MyHomePageState extends State<MyHomePage> {
             child: GameWidget(
               transformer: originToCenter,
               color: Colors.white,
-              components: [
-                [
-                  AxisComponent(viewport),
-                ],
-                [
-                  PathComponent([arc], stroke: Stroke(strokeWidth: 5)),
-                  PathComponent(arcs.toList(),
-                      stroke: Stroke(strokeWidth: 3, color: Colors.red)),
-                ],
-                [
-                  VerticesComponent(
-                    [arc],
-                    vertexPainter: CircularVertexPainter(12,
-                        fill: Fill(color: Colors.blue)),
-                  ),
-                  VerticesComponent(arcs.toList(),
-                      vertexPainter: CircularVertexPainter(10,
-                          fill: Fill(color: Colors.red))),
-                  PointsComponent([point.o],
-                      vertexPainter: CircularVertexPainter(5,
-                          fill: Fill(color: Colors.green))),
-                ],
-              ],
+              component: LayerComponent([
+                AxisComponent(viewport),
+                PathComponent([arc], stroke: Stroke(strokeWidth: 5)),
+                PathComponent(arcs.toList(),
+                    stroke: Stroke(strokeWidth: 3, color: Colors.red)),
+                VerticesComponent(
+                  [arc],
+                  vertexPainter:
+                      CircularVertexPainter(12, fill: Fill(color: Colors.blue)),
+                ),
+                VerticesComponent(arcs.toList(),
+                    vertexPainter: CircularVertexPainter(10,
+                        fill: Fill(color: Colors.red))),
+                PointsComponent([point],
+                    vertexPainter: CircularVertexPainter(5,
+                        fill: Fill(color: Colors.green))),
+              ]),
               onResize: (size) {
                 setState(() {
-                  viewport = Rect.fromLTWH(-size.width / 2, -size.height / 2,
-                      size.width, size.height);
+                  viewport = R(-size.width / 2, -size.height / 2, size.width,
+                      size.height);
                 });
               },
             ),
@@ -125,5 +120,5 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Rect viewport = Rect.fromLTWH(-200, -200, 400, 400);
+  R viewport = R(-200, -200, 400, 400);
 }

@@ -47,8 +47,8 @@ class _MyHomePageState extends State<MyHomePage> {
   @override
   Widget build(BuildContext context) {
     final line1 = LineSegment(l1p1, l1p2);
-    final line2 = LineSegment(l2p1, l2p2);
-    final intersect = line1.intersectLineSegment(line2);
+    final circle = Circle(center: l2p1, radius: l2p1.distanceTo(l2p2));
+    final intersects = line1.intersectCircle(circle);
 
     return Scaffold(
       body: Column(
@@ -63,28 +63,22 @@ class _MyHomePageState extends State<MyHomePage> {
               color: Colors.white,
               transformer: originToCenter,
               component: LayerComponent([
-                LayerComponent([
-                  AxisComponent(viewport),
-                ]),
-                LayerComponent([
-                  SegmentsComponent([line1, line2],
-                      stroke: Stroke(strokeWidth: 5)),
-                  if (intersect != null) PointsComponent([intersect]),
-                ]),
-                LayerComponent([
-                  PointControlComponent(l1p1,
-                      selected: controls.isSelected(PointId.l1p1),
-                      controlData: ControlData(controls, PointId.l1p1)),
-                  PointControlComponent(l1p2,
-                      selected: controls.isSelected(PointId.l1p2),
-                      controlData: ControlData(controls, PointId.l1p2)),
-                  PointControlComponent(l2p1,
-                      selected: controls.isSelected(PointId.l2p1),
-                      controlData: ControlData(controls, PointId.l2p1)),
-                  PointControlComponent(l2p2,
-                      selected: controls.isSelected(PointId.l2p2),
-                      controlData: ControlData(controls, PointId.l2p2)),
-                ]),
+                AxisComponent(viewport),
+                SegmentsComponent([line1], stroke: Stroke(strokeWidth: 5)),
+                // TODO CircleComponent(),
+                PointsComponent(intersects),
+                PointControlComponent(l1p1,
+                    selected: controls.isSelected(PointId.l1p1),
+                    controlData: ControlData(controls, PointId.l1p1)),
+                PointControlComponent(l1p2,
+                    selected: controls.isSelected(PointId.l1p2),
+                    controlData: ControlData(controls, PointId.l1p2)),
+                PointControlComponent(l2p1,
+                    selected: controls.isSelected(PointId.l2p1),
+                    controlData: ControlData(controls, PointId.l2p1)),
+                PointControlComponent(l2p2,
+                    selected: controls.isSelected(PointId.l2p2),
+                    controlData: ControlData(controls, PointId.l2p2)),
               ]),
               onResize: (size) {
                 setState(() {

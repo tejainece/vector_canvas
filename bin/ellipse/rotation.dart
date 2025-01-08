@@ -1,5 +1,6 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
-import 'package:game_engine/game_engine.dart';
 import 'package:vector_canvas/vector_canvas.dart';
 import 'package:vector_path/vector_path.dart';
 
@@ -46,7 +47,6 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    print(rotation);
     final ellipse = Ellipse(radii, center: center, rotation: rotation);
     final arc = ArcSegment(
       ellipse.pointAtAngle(startAngle),
@@ -78,19 +78,16 @@ class _MyHomePageState extends State<MyHomePage> {
             child: GameWidget(
               color: Colors.white,
               transformer: originToCenterWith(),
-              components: [
-                [
-                  SegmentsComponent([arc], stroke: Stroke(strokeWidth: 7)),
-                  SegmentsComponent([reversed],
-                      stroke: Stroke(strokeWidth: 3, color: Colors.blue)),
-                  AxisComponent(viewport),
-                ],
-                [],
-              ],
+              component: LayerComponent([
+                SegmentsComponent([arc], stroke: Stroke(strokeWidth: 7)),
+                SegmentsComponent([reversed],
+                    stroke: Stroke(strokeWidth: 3, color: Colors.blue)),
+                AxisComponent(viewport),
+              ]),
               onResize: (size) {
                 setState(() {
-                  viewport = Rect.fromLTWH(-size.width / 2, -size.height / 2,
-                      size.width, size.height);
+                  viewport = R(-size.width / 2, -size.height / 2, size.width,
+                      size.height);
                 });
               },
             ),
@@ -100,5 +97,5 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Rect viewport = Rect.fromLTWH(-200, -200, 400, 400);
+  R viewport = R(-200, -200, 400, 400);
 }

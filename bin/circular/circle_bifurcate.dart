@@ -1,5 +1,6 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
-import 'package:game_engine/game_engine.dart';
 import 'package:vector_canvas/vector_canvas.dart';
 import 'package:vector_path/vector_path.dart';
 
@@ -98,30 +99,23 @@ class _MyHomePageState extends State<MyHomePage> {
             child: GameWidget(
               color: Colors.white,
               transformer: originToCenter,
-              components: [
-                [
-                  AxisComponent(viewport),
-                ],
-                [
-                  SegmentsComponent([arc], stroke: Stroke(strokeWidth: 7)),
-                  SegmentsComponent([arcA]),
-                  SegmentsComponent([arcB],
-                      stroke: Stroke(color: Colors.orange)),
-                  SegmentsComponent([arcC], stroke: Stroke(color: Colors.blue)),
-                  SegmentsComponent([arc1],
-                      stroke: Stroke(strokeWidth: 3, color: Colors.blue)),
-                  SegmentsComponent([arc2],
-                      stroke: Stroke(strokeWidth: 3, color: Colors.orange)),
-                ],
-                [
-                  PointsComponent([pointBf.o],
-                      vertexPainter: CircularVertexPainter(7)),
-                ],
-              ],
+              component: LayerComponent([
+                AxisComponent(viewport),
+                SegmentsComponent([arc], stroke: Stroke(strokeWidth: 7)),
+                SegmentsComponent([arcA]),
+                SegmentsComponent([arcB], stroke: Stroke(color: Colors.orange)),
+                SegmentsComponent([arcC], stroke: Stroke(color: Colors.blue)),
+                SegmentsComponent([arc1],
+                    stroke: Stroke(strokeWidth: 3, color: Colors.blue)),
+                SegmentsComponent([arc2],
+                    stroke: Stroke(strokeWidth: 3, color: Colors.orange)),
+                PointsComponent([pointBf],
+                    vertexPainter: CircularVertexPainter(7)),
+              ]),
               onResize: (size) {
                 setState(() {
-                  viewport = Rect.fromLTWH(-size.width / 2, -size.height / 2,
-                      size.width, size.height);
+                  viewport = R(-size.width / 2, -size.height / 2, size.width,
+                      size.height);
                 });
               },
             ),
@@ -131,5 +125,5 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  Rect viewport = Rect.fromLTWH(-200, -200, 400, 400);
+  R viewport = R(-200, -200, 400, 400);
 }

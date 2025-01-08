@@ -1,3 +1,5 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:game_engine/game_engine.dart';
 import 'package:vector_canvas/vector_canvas.dart';
@@ -45,20 +47,11 @@ class AnglesComponent implements Component {
     }
   }
 
-  @override
-  void tick(TickCtx ctx) {
-    if (!_dirty) return;
-    ctx.shouldRender();
-    _dirty = false;
-  }
-
-  bool _dirty = true;
-
   void set(
       {Iterable<LineSegment>? lines,
       double? radius,
-      Optional<ToPaint>? piePainter,
-      Optional<Stroke>? arcPainter}) {
+      Argument<ToPaint>? piePainter,
+      Argument<Stroke>? arcPainter}) {
     bool needsUpdate = false;
     if (lines != null) {
       if (!lines.isSame(_lines)) {
@@ -90,7 +83,9 @@ class AnglesComponent implements Component {
         needsUpdate = true;
       }
     }
-    _dirty = _dirty || needsUpdate;
+    if (needsUpdate) {
+      _ctx?.requestRender(this);
+    }
   }
 
   void _updatePies() {
@@ -135,8 +130,10 @@ class AnglesComponent implements Component {
     }
   }
 
+  ComponentContext? _ctx;
+
   @override
-  void handlePointerEvent(PointerEvent event) {
-    // TODO
+  void onAttach(ComponentContext ctx) {
+    _ctx = ctx;
   }
 }

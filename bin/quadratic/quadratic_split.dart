@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:game_engine/game_engine.dart';
 import 'package:vector_canvas/vector_canvas.dart';
 import 'package:vector_path/vector_path.dart';
 
@@ -48,24 +47,19 @@ class _MyHomePageState extends State<MyHomePage> {
         child: GameWidget(
             transformer: originToCenterWith(),
             color: Colors.white,
-            components: [
-              [
-                PathComponent(quadratic.segments,
-                    stroke: Stroke(strokeWidth: 5)),
-                PathComponent(quadraticSplit.segments,
-                    stroke: Stroke(strokeWidth: 3, color: Colors.red)),
-              ],
-              [
-                VerticesComponent(
-                  quadratic.segments,
+            component: LayerComponent([
+              PathComponent(quadratic.segments, stroke: Stroke(strokeWidth: 5)),
+              PathComponent(quadraticSplit.segments,
+                  stroke: Stroke(strokeWidth: 3, color: Colors.red)),
+              VerticesComponent(
+                quadratic.segments,
+                vertexPainter:
+                    CircularVertexPainter(12, fill: Fill(color: Colors.blue)),
+              ),
+              VerticesComponent(quadraticSplit.segments,
                   vertexPainter:
-                      CircularVertexPainter(12, fill: Fill(color: Colors.blue)),
-                ),
-                VerticesComponent(quadraticSplit.segments,
-                    vertexPainter: CircularVertexPainter(10,
-                        fill: Fill(color: Colors.red))),
-              ],
-            ]),
+                      CircularVertexPainter(10, fill: Fill(color: Colors.red))),
+            ])),
       ),
     );
   }
