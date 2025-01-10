@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:vector_canvas/vector_canvas.dart';
 import 'package:vector_path/vector_path.dart';
 
-import '../_ui/controls.dart';
+import '../../_ui/controls.dart';
 
 void main() {
   runApp(const MyApp());
@@ -68,30 +68,34 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Wrap(
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              slider('t', t, 0, 1, (value) => setState(() => t = value)),
-              slider('t1', t1, 0, 1, (value) => setState(() => t1 = value)),
-              slider('t2', t2, 0, 1, (value) => setState(() => t2 = value)),
-              slider('Theta', rotation, 0, 2 * pi,
-                  (value) => setState(() => rotation = value)),
-              slider('Center.x', center.x, -400, 400,
-                  (value) => setState(() => center = P(value, center.y))),
-              slider('Center.y', center.y, -400, 400,
-                  (value) => setState(() => center = P(center.x, value))),
-              slider('Radii.x', radii.x, 0, 400,
-                  (value) => setState(() => radii = P(value, radii.y))),
-              slider('Radii.y', radii.y, 0, 400,
-                  (value) => setState(() => radii = P(radii.x, value))),
-            ],
+          SizedBox(
+            width: double.infinity,
+            height: 50,
+            child: SingleChildScrollView(
+              child: Wrap(
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  slider('t', t, 0, 1, (value) => setState(() => t = value)),
+                  slider('t1', t1, 0, 1, (value) => setState(() => t1 = value)),
+                  slider('t2', t2, 0, 1, (value) => setState(() => t2 = value)),
+                  slider('Theta', rotation, 0, 2 * pi,
+                      (value) => setState(() => rotation = value)),
+                  slider('Radii.x', radii.x, 0, 400,
+                      (value) => setState(() => radii = P(value, radii.y))),
+                  slider('Radii.y', radii.y, 0, 400,
+                      (value) => setState(() => radii = P(radii.x, value))),
+                ],
+              ),
+            ),
           ),
           Expanded(
             child: GameWidget(
-              transformer: originToCenter,
               color: Colors.white,
+              transformer: yUp
+                  ? centeredYUpWith(translate: viewport.center)
+                  : centeredYDownWith(translate: viewport.center),
               component: LayerComponent([
-                AxisComponent(viewport),
+                AxisComponent(viewport, yUp: yUp),
                 PathComponent([arc], stroke: Stroke(strokeWidth: 5)),
                 PathComponent(arcs.toList(),
                     stroke: Stroke(strokeWidth: 3, color: Colors.red)),
@@ -106,13 +110,17 @@ class _MyHomePageState extends State<MyHomePage> {
                 PointsComponent([point],
                     vertexPainter: CircularVertexPainter(5,
                         fill: Fill(color: Colors.green))),
+                PointControlComponent(center,
+                    selected: controls.isSelected(PointId.center),
+                    controlData: ControlData(controls, PointId.center)),
               ]),
               onResize: (size) {
                 setState(() {
-                  viewport = R(-size.width / 2, -size.height / 2, size.width,
-                      size.height);
+                  viewport =
+                      R.centerAt(viewport.center, size.width, size.height);
                 });
               },
+              onPan: _onPan,
             ),
           ),
         ],
@@ -120,5 +128,33 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  void _onPan(PanData data) {
+    P delta = -P(data.offsetDelta.dx, (yUp ? -1 : 1) * data.offsetDelta.dy);
+    if (controls.isNotEmpty) {
+      for (var id in PointId.values) {
+        if (!controls.isSelected(id)) continue;
+        final point = _map[id]!;
+        point.value = point.value - delta;
+      }
+    } else {
+      viewport = viewport.shift(delta);
+      setState(() {});
+    }
+    setState(() {});
+  }
+
+  bool yUp = true;
   R viewport = R(-200, -200, 400, 400);
+
+  late final controls = Controls<PointId>(onChanged: () {
+    setState(() {});
+  });
+
+  late final _map = <PointId, Proxy<P>>{
+    PointId.center: Proxy(() => center, (v) => center = v),
+  };
+}
+
+enum PointId {
+  center,
 }

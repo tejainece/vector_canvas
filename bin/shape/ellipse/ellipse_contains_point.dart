@@ -39,10 +39,6 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
   }
 
-  late final controls = Controls<PointId>(onChanged: () {
-    setState(() {});
-  });
-
   double rotation = 0;
   var center = P(0, 0);
   var radii = P(100, 80);
@@ -58,53 +54,43 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Wrap(
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              slider('Theta', rotation, 0, 2 * pi,
-                  (value) => setState(() => rotation = value)),
-              slider('Center.x', center.x, -400, 400,
-                  (value) => setState(() => center = P(value, center.y))),
-              slider('Center.y', center.y, -400, 400,
-                  (value) => setState(() => center = P(center.x, value))),
-              slider('Radii.x', radii.x, 0, 400,
-                  (value) => setState(() => radii = P(value, radii.y))),
-              slider('Radii.y', radii.y, 0, 400,
-                  (value) => setState(() => radii = P(radii.x, value))),
-            ],
+          SizedBox(
+            width: double.infinity,
+            height: 50,
+            child: SingleChildScrollView(
+              child: Wrap(
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  slider('Theta', rotation, 0, 2 * pi,
+                      (value) => setState(() => rotation = value)),
+                  slider('Radii.x', radii.x, 0, 400,
+                      (value) => setState(() => radii = P(value, radii.y))),
+                  slider('Radii.y', radii.y, 0, 400,
+                      (value) => setState(() => radii = P(radii.x, value))),
+                ],
+              ),
+            ),
           ),
           Expanded(
             child: GameWidget(
               color: Colors.white,
-              transformer: originToCenterWith(translate: viewport.center),
+              transformer: yUp
+                  ? centeredYUpWith(translate: viewport.center)
+                  : centeredYDownWith(translate: viewport.center),
               component: LayerComponent([
-                LayerComponent([
-                  AxisComponent(viewport),
-                  // HAxisGridComponent(viewport, gap: 100),
-                  // VAxisGridComponent(viewport, gap: 100),
-                  /*HAxisTickComponent(viewport, gap: 10, specialEvery: 5),
-                  VAxisTickComponent(viewport, gap: 10, specialEvery: 5),
-                  HAxisTickLabelComponent(viewport,
-                      gap: 100, atY: -5, flip: true),
-                  VAxisTickLabelComponent(viewport,
-                      gap: 100, atX: 10, flip: true),*/
-                ]),
-                LayerComponent([
-                  EllipseComponent(ellipse),
-                ]),
-                LayerComponent([
-                  PointControlComponent(point,
-                      selected: controls.isSelected(PointId.point),
-                      controlData: ControlData(controls, PointId.point)),
-                  PointControlComponent(center,
-                      selected: controls.isSelected(PointId.center),
-                      controlData: ControlData(controls, PointId.center)),
-                ]),
+                AxisComponent(viewport, yUp: yUp),
+                EllipseComponent(ellipse),
+                PointControlComponent(point,
+                    selected: controls.isSelected(PointId.point),
+                    controlData: ControlData(controls, PointId.point)),
+                PointControlComponent(center,
+                    selected: controls.isSelected(PointId.center),
+                    controlData: ControlData(controls, PointId.center)),
               ]),
               onResize: (size) {
                 setState(() {
-                  viewport = R(-size.width / 2, -size.height / 2, size.width,
-                      size.height);
+                  viewport =
+                      R.centerAt(viewport.center, size.width, size.height);
                 });
               },
               onPan: _onPan,
@@ -112,7 +98,9 @@ class _MyHomePageState extends State<MyHomePage> {
           ),
           Row(
             children: [
-              Checkbox(value: has, onChanged: null),
+              Checkbox(value: has, onChanged: null, shape: CircleBorder()),
+              Text('Contains',
+                  style: TextStyle(color: has ? Colors.green : Colors.red)),
             ],
           ),
         ],
@@ -121,23 +109,26 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   void _onPan(PanData data) {
+    P delta = -P(data.offsetDelta.dx, (yUp ? -1 : 1) * data.offsetDelta.dy);
     if (controls.isNotEmpty) {
-      final offset = P(data.offsetDelta.dx, -data.offsetDelta.dy);
       for (var id in PointId.values) {
         if (!controls.isSelected(id)) continue;
         final point = _map[id]!;
-        point.value = point.value + offset;
+        point.value = point.value - delta;
       }
     } else {
-      // viewportOffset = viewportOffset - data.offsetDelta;
-      viewport = viewport.shift(-P(data.offsetDelta.dx, data.offsetDelta.dy));
+      viewport = viewport.shift(delta);
       setState(() {});
     }
     setState(() {});
   }
 
-  Offset viewportOffset = Offset.zero;
+  bool yUp = true;
   R viewport = R(-200, -200, 400, 400);
+
+  late final controls = Controls<PointId>(onChanged: () {
+    setState(() {});
+  });
 
   late final _map = <PointId, Proxy<P>>{
     PointId.point: Proxy(() => point, (v) => point = v),

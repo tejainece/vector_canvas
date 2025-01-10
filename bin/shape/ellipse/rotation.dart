@@ -75,7 +75,7 @@ class _MyHomePageState extends State<MyHomePage> {
           Expanded(
             child: GameWidget(
               color: Colors.white,
-              transformer: originToCenterWith(),
+              transformer: centeredYUpWith(),
               component: LayerComponent([
                 PointsComponent(points,
                     vertexPainter: CircularVertexPainter(10,

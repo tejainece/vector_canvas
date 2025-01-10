@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:vector_canvas/vector_canvas.dart';
 import 'package:vector_path/vector_path.dart';
 
-import '../_ui/controls.dart';
+import '../../_ui/controls.dart';
 
 void main() {
   runApp(const MyApp());
@@ -62,38 +62,46 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Wrap(
-            crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              intSlider('r', radius, 10, 200,
-                  (value) => setState(() => radius = value)),
-              slider('start', startAngle, 0, 360,
-                  (value) => setState(() => startAngle = value)),
-              slider('end', endAngle, 0, 360,
-                  (value) => setState(() => endAngle = value)),
-              slider('centerX', center.x, -400, 400,
-                  (v) => setState(() => center = P(v, center.y))),
-              slider('centerY', center.y, -400, 400,
-                  (v) => setState(() => center = P(center.x, v))),
-            ],
+          SizedBox(
+            width: double.infinity,
+            height: 50,
+            child: SingleChildScrollView(
+              child: Wrap(
+                crossAxisAlignment: WrapCrossAlignment.center,
+                children: [
+                  intSlider('r', radius, 10, 200,
+                      (value) => setState(() => radius = value)),
+                  slider('start', startAngle, 0, 360,
+                      (value) => setState(() => startAngle = value)),
+                  slider('end', endAngle, 0, 360,
+                      (value) => setState(() => endAngle = value)),
+                ],
+              ),
+            ),
           ),
           Expanded(
             child: GameWidget(
               color: Colors.white,
-              transformer: originToCenter,
+              transformer: yUp
+                  ? centeredYUpWith(translate: viewport.center)
+                  : centeredYDownWith(translate: viewport.center),
               component: LayerComponent([
-                AxisComponent(viewport),
+                AxisComponent(viewport, yUp: yUp),
                 SegmentsComponent([arc], stroke: Stroke(strokeWidth: 3)),
                 RectangleComponent(bbox,
                     fill: null,
                     stroke: Stroke(color: Colors.blue, strokeWidth: 3)),
+                PointControlComponent(center,
+                    selected: controls.isSelected(PointId.center),
+                    controlData: ControlData(controls, PointId.center)),
               ]),
               onResize: (size) {
                 setState(() {
-                  viewport = R(-size.width / 2, -size.height / 2, size.width,
-                      size.height);
+                  viewport =
+                      R.centerAt(viewport.center, size.width, size.height);
                 });
               },
+              onPan: _onPan,
             ),
           ),
         ],
@@ -101,5 +109,33 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
+  void _onPan(PanData data) {
+    P delta = -P(data.offsetDelta.dx, (yUp ? -1 : 1) * data.offsetDelta.dy);
+    if (controls.isNotEmpty) {
+      for (var id in PointId.values) {
+        if (!controls.isSelected(id)) continue;
+        final point = _map[id]!;
+        point.value = point.value - delta;
+      }
+    } else {
+      viewport = viewport.shift(delta);
+      setState(() {});
+    }
+    setState(() {});
+  }
+
+  bool yUp = true;
   R viewport = R(-200, -200, 400, 400);
+
+  late final controls = Controls<PointId>(onChanged: () {
+    setState(() {});
+  });
+
+  late final _map = <PointId, Proxy<P>>{
+    PointId.center: Proxy(() => center, (v) => center = v),
+  };
+}
+
+enum PointId {
+  center,
 }

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:vector_canvas/vector_canvas.dart';
 import 'package:vector_path/vector_path.dart';
 
-import '../_ui/controls.dart';
+import '../../_ui/controls.dart';
 
 void main() {
   runApp(const MyApp());
@@ -14,7 +14,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Quadratic.boundingBox',
+      title: 'lerp',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
@@ -41,9 +41,9 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final quadratic =
-    QuadraticSegment(p1: P(100, 100), p2: P(200, 100), c: P(150, 50));
-    final bbox = quadratic.boundingBox;
+    final quadratic = VectorCurve(
+        [QuadraticSegment(p1: P(100, 100), p2: P(200, 100), c: P(150, 50))]);
+    final quadraticPoint = quadratic.segments[0].lerp(t);
 
     return Scaffold(
       body: Column(
@@ -56,12 +56,15 @@ class _MyHomePageState extends State<MyHomePage> {
             ],
           ),
           Expanded(
-            child: GameWidget(color: Colors.white, component: LayerComponent([
-              SegmentsComponent([quadratic], stroke: Stroke(strokeWidth: 5)),
-              RectangleComponent(bbox,
-                  fill: null,
-                  stroke: Stroke(color: Colors.blue, strokeWidth: 3)),
-            ]),),
+            child: GameWidget(
+                color: Colors.white,
+                component: LayerComponent([
+                  PathComponent(quadratic.segments,
+                      stroke: Stroke(strokeWidth: 5)),
+                  PointsComponent([quadraticPoint],
+                      vertexPainter: CircularVertexPainter(12,
+                          fill: Fill(color: Colors.blue))),
+                ])),
           ),
         ],
       ),

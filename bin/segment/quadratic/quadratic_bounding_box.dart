@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:vector_canvas/vector_canvas.dart';
 import 'package:vector_path/vector_path.dart';
 
+import '../../_ui/controls.dart';
+
 void main() {
   runApp(const MyApp());
 }
@@ -12,7 +14,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Line.normalAt',
+      title: 'Quadratic.boundingBox',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
@@ -35,16 +37,13 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
   }
 
-  P initial = P(100, 0);
-  double angle1 = 30.toRadian;
-  double angle2 = 15.toRadian;
+  double t = 0.1;
 
   @override
   Widget build(BuildContext context) {
-    final affine1 = Affine2d.rotator(angle1);
-    final affine2 = affine1.rotate(angle2);
-    final point1 = initial.transform(affine1);
-    final point2 = initial.transform(affine2);
+    final quadratic =
+    QuadraticSegment(p1: P(100, 100), p2: P(200, 100), c: P(150, 50));
+    final bbox = quadratic.boundingBox;
 
     return Scaffold(
       body: Column(
@@ -52,23 +51,17 @@ class _MyHomePageState extends State<MyHomePage> {
         children: [
           Wrap(
             crossAxisAlignment: WrapCrossAlignment.center,
-            children: [],
+            children: [
+              slider('T', t, 0, 1, (v) => setState(() => t = v)),
+            ],
           ),
           Expanded(
-            child: GameWidget(
-              color: Colors.white,
-              transformer: originToCenter,
-              component: LayerComponent(
-                [
-                  SegmentsComponent([LineSegment(origin, initial)],
-                      stroke: Stroke(strokeWidth: 3)),
-                  SegmentsComponent([LineSegment(origin, point1)],
-                      stroke: Stroke(color: Colors.red)),
-                  SegmentsComponent([LineSegment(origin, point2)],
-                      stroke: Stroke(color: Colors.blue)),
-                ],
-              ),
-            ),
+            child: GameWidget(color: Colors.white, component: LayerComponent([
+              SegmentsComponent([quadratic], stroke: Stroke(strokeWidth: 5)),
+              RectangleComponent(bbox,
+                  fill: null,
+                  stroke: Stroke(color: Colors.blue, strokeWidth: 3)),
+            ]),),
           ),
         ],
       ),

@@ -45,7 +45,7 @@ class _MyHomePageState extends State<MyHomePage> {
     return Scaffold(
       body: Center(
         child: GameWidget(
-            transformer: originToCenterWith(),
+            transformer: centeredYUpWith(),
             color: Colors.white,
             component: LayerComponent([
               PathComponent(quadratic.segments, stroke: Stroke(strokeWidth: 5)),

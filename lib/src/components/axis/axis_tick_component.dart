@@ -4,7 +4,7 @@ import 'package:vector_canvas/vector_canvas.dart';
 import 'package:vector_path/vector_path.dart';
 
 class HAxisTickComponent extends Component {
-  R _rect;
+  R _viewport;
 
   double _gap;
 
@@ -17,11 +17,11 @@ class HAxisTickComponent extends Component {
   VertexPainter _specialTickPainter;
 
   HAxisTickComponent(
-    this._rect, {
+    this._viewport, {
     double gap = 10,
     double atY = 0,
     VertexPainter tickPainter = const VTickPainter(),
-    int? specialEvery,
+    int? specialEvery = 5,
     VertexPainter specialTickPainter = const VTickPainter(size: 4),
   })  : _gap = gap,
         _atY = atY,
@@ -48,15 +48,15 @@ class HAxisTickComponent extends Component {
   }
 
   void set(
-      {R? rect,
+      {R? viewport,
       double? gap,
       double? atY,
       VertexPainter? tickPainter,
       int? specialEvery,
       VertexPainter? specialTickPainter}) {
     bool needsUpdate = false;
-    if (rect != null && rect != _rect) {
-      _rect = rect;
+    if (viewport != null && !viewport.equals(_viewport)) {
+      _viewport = viewport;
       needsUpdate = true;
     }
     if (gap != null && _gap != gap) {
@@ -90,8 +90,8 @@ class HAxisTickComponent extends Component {
 
   void _compute() {
     final points = <P>[];
-    double low = _rect.left.lowerNearestMultipleOf(_gap);
-    double high = _rect.right.higherNearestMultipleOf(_gap);
+    double low = _viewport.left.lowerNearestMultipleOf(_gap);
+    double high = _viewport.right.higherNearestMultipleOf(_gap);
     for (double x = low; x <= high + 1e-8; x += _gap) {
       points.add(P(x, _atY));
     }
@@ -107,7 +107,7 @@ class HAxisTickComponent extends Component {
 }
 
 class VAxisTickComponent extends Component {
-  R _rect;
+  R _viewport;
 
   double _gap;
 
@@ -120,11 +120,11 @@ class VAxisTickComponent extends Component {
   VertexPainter _specialTickPainter;
 
   VAxisTickComponent(
-    this._rect, {
+    this._viewport, {
     double gap = 10,
     double atX = 0,
     VertexPainter tickPainter = const HTickPainter(),
-    int? specialEvery,
+    int? specialEvery = 5,
     VertexPainter specialTickPainter = const HTickPainter(size: 4),
   })  : _gap = gap,
         _atX = atX,
@@ -151,15 +151,15 @@ class VAxisTickComponent extends Component {
   }
 
   void set(
-      {R? rect,
+      {R? viewport,
       double? gap,
       double? atX,
       VertexPainter? tickPainter,
       int? specialEvery,
       VertexPainter? specialTickPainter}) {
     bool needsUpdate = false;
-    if (rect != null && rect != _rect) {
-      _rect = rect;
+    if (viewport != null && !viewport.equals(_viewport)) {
+      _viewport = viewport;
       needsUpdate = true;
     }
     if (gap != null && _gap != gap) {
@@ -193,8 +193,8 @@ class VAxisTickComponent extends Component {
 
   void _compute() {
     final points = <P>[];
-    double low = _rect.top.lowerNearestMultipleOf(_gap);
-    double high = _rect.bottom.higherNearestMultipleOf(_gap);
+    double low = _viewport.top.lowerNearestMultipleOf(_gap);
+    double high = _viewport.bottom.higherNearestMultipleOf(_gap);
     for (double y = low; y <= high + 1e-8; y += _gap) {
       points.add(P(_atX, y));
     }

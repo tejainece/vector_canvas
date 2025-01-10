@@ -11,7 +11,19 @@ class Controls<T> {
 
   Controls({void Function()? onChanged}) : _onChanged = onChanged;
 
-  void select(T id, {bool append = false}) {
+  int? _pointer;
+
+  int? get pointer => _pointer;
+
+  void append(int pointer, T id) {
+    _pointer = pointer;
+    if (_selected.contains(id)) return;
+    _selected.add(id);
+    _emitChanged();
+  }
+
+  void select(int pointer, T id, {bool append = false}) {
+    _pointer = pointer;
     bool changed = false;
     if (!append) {
       if (_selected.isEmpty) {
@@ -39,7 +51,8 @@ class Controls<T> {
     }
   }
 
-  void deselect(T id, {bool append = false}) {
+  void deselect(int pointer, T id, {bool append = false}) {
+    _pointer = pointer;
     bool changed = false;
     if (!append) {
       changed = changed || _selected.isNotEmpty;
@@ -52,11 +65,12 @@ class Controls<T> {
     }
   }
 
-  void toggle(T id, {bool append = false}) {
+  void toggle(int pointer, T id, {bool append = false}) {
+    _pointer = pointer;
     if (_selected.contains(id)) {
-      deselect(id, append: append);
+      deselect(pointer, id, append: append);
     } else {
-      select(id, append: append);
+      select(pointer, id, append: append);
     }
   }
 

@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:vector_canvas/vector_canvas.dart';
 import 'package:vector_path/vector_path.dart';
 
-import '../_ui/controls.dart';
+import '../../_ui/controls.dart';
 
 void main() {
   runApp(const MyApp());

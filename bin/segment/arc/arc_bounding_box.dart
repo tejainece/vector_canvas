@@ -4,7 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:vector_canvas/vector_canvas.dart';
 import 'package:vector_path/vector_path.dart';
 
-import '../_ui/controls.dart';
+import '../../_ui/controls.dart';
 
 void main() {
   runApp(const MyApp());
@@ -16,7 +16,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Line.normalAt',
+      title: 'Ellipse.boundingBox',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
@@ -39,13 +39,25 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
   }
 
-  P point = P(100, 0);
-  double angle1 = 0.toRadian;
+  P radii = P(100, 80);
+  double startAngle = 0.toRadian;
+  double endAngle = 270.toRadian;
+  bool largeArc = true;
+  P center = P(0, 0);
+  double rotation = 0.toRadian;
 
   @override
   Widget build(BuildContext context) {
-    final affine1 = Affine2d.rotator(angle1);
-    final point1 = point.transform(affine1);
+    final ellipse = Ellipse(radii, center: center, rotation: rotation);
+    final arc = ArcSegment(
+      ellipse.pointAtAngle(startAngle),
+      ellipse.pointAtAngle(endAngle),
+      radii,
+      largeArc: (startAngle - endAngle).abs() > pi || startAngle == endAngle,
+      clockwise: startAngle > endAngle,
+      rotation: rotation,
+    );
+    final bbox = arc.boundingBox;
 
     return Scaffold(
       body: Column(
@@ -58,8 +70,16 @@ class _MyHomePageState extends State<MyHomePage> {
               child: Wrap(
                 crossAxisAlignment: WrapCrossAlignment.center,
                 children: [
-                  slider('Angle', angle1, 0, 2 * pi,
-                      (value) => setState(() => angle1 = value)),
+                  slider('StartAngle', startAngle, 0, 2 * pi,
+                      (v) => setState(() => startAngle = v)),
+                  slider('EndAngle', endAngle, 0, 2 * pi,
+                      (v) => setState(() => endAngle = v)),
+                  slider('Rotation', rotation, 0, 2 * pi,
+                      (v) => setState(() => rotation = v)),
+                  slider('radiusX', radii.x, 0, 400,
+                      (v) => setState(() => radii = P(v, radii.y))),
+                  slider('radiusY', radii.y, 0, 400,
+                      (v) => setState(() => radii = P(radii.x, v))),
                 ],
               ),
             ),
@@ -72,13 +92,13 @@ class _MyHomePageState extends State<MyHomePage> {
                   : centeredYDownWith(translate: viewport.center),
               component: LayerComponent([
                 AxisComponent(viewport, yUp: yUp),
-                SegmentsComponent([LineSegment(origin, point)],
-                    stroke: Stroke(strokeWidth: 3)),
-                SegmentsComponent([LineSegment(origin, point1)],
-                    stroke: Stroke(color: Colors.red)),
-                PointControlComponent(point,
-                    selected: controls.isSelected(PointId.point),
-                    controlData: ControlData(controls, PointId.point)),
+                SegmentsComponent([arc], stroke: Stroke(strokeWidth: 3)),
+                RectangleComponent(bbox,
+                    fill: null,
+                    stroke: Stroke(color: Colors.blue, strokeWidth: 3)),
+                PointControlComponent(center,
+                    selected: controls.isSelected(PointId.center),
+                    controlData: ControlData(controls, PointId.center)),
               ]),
               onResize: (size) {
                 setState(() {
@@ -104,6 +124,7 @@ class _MyHomePageState extends State<MyHomePage> {
       }
     } else {
       viewport = viewport.shift(delta);
+      setState(() {});
     }
     setState(() {});
   }
@@ -111,13 +132,15 @@ class _MyHomePageState extends State<MyHomePage> {
   bool yUp = true;
   R viewport = R(-200, -200, 400, 400);
 
-  late final controls = Controls<PointId>(onChanged: () => setState(() {}));
+  late final controls = Controls<PointId>(onChanged: () {
+    setState(() {});
+  });
 
   late final _map = <PointId, Proxy<P>>{
-    PointId.point: Proxy(() => point, (v) => point = v),
+    PointId.center: Proxy(() => center, (v) => center = v),
   };
 }
 
 enum PointId {
-  point,
+  center,
 }

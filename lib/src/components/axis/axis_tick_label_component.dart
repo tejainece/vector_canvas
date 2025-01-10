@@ -4,7 +4,7 @@ import 'package:vector_canvas/vector_canvas.dart';
 import 'package:vector_path/vector_path.dart';
 
 class HAxisTickLabelComponent implements Component, NeedsDetach {
-  R _rect;
+  R _viewport;
 
   double _gap;
 
@@ -18,24 +18,24 @@ class HAxisTickLabelComponent implements Component, NeedsDetach {
 
   String Function(double) _tickLabeler;
 
-  Set<double> _skip;
+  List<double> _skip;
 
   HAxisTickLabelComponent(
-    this._rect, {
-    double gap = 10,
-    double atY = 0,
+    this._viewport, {
+    double gap = 100,
+    double atY = -5,
     bool flip = false,
     TextStyle? style,
     Alignment alignment = Alignment.bottomCenter,
     String Function(double) tickLabeler = tickLabeler,
-    Set<double> skip = const {},
+    List<double> skip = const [0],
   })  : _gap = gap,
         _atY = atY,
         _flip = flip,
         _style = style ?? TextStyle(color: Colors.black),
         _alignment = alignment,
         _tickLabeler = tickLabeler,
-        _skip = skip.toSet() {
+        _skip = skip.toList() {
     _compute();
   }
 
@@ -57,18 +57,18 @@ class HAxisTickLabelComponent implements Component, NeedsDetach {
   }
 
   void set({
-    R? rect,
+    R? viewport,
     double? gap,
     double? atY,
     bool? flip,
     TextStyle? style,
     Alignment? alignment,
     String Function(double)? tickLabeler,
-    Set<double>? skip,
+    List<double>? skip,
   }) {
     bool needsUpdate = false;
-    if (rect != null && rect != _rect) {
-      _rect = rect;
+    if (viewport != null && !viewport.equals(_viewport)) {
+      _viewport = viewport;
       needsUpdate = true;
     }
     if (gap != null && _gap != gap) {
@@ -98,7 +98,7 @@ class HAxisTickLabelComponent implements Component, NeedsDetach {
       _tickLabeler = tickLabeler;
       needsUpdate = true;
     }
-    if (skip != null && setEquals(_skip, skip)) {
+    if (skip != null && listEquals(_skip, skip)) {
       _skip = skip;
       needsUpdate = true;
     }
@@ -110,8 +110,8 @@ class HAxisTickLabelComponent implements Component, NeedsDetach {
   void _compute() {
     _ctx?.unregisterComponents(_texts);
     final points = <AnchoredTextComponent>[];
-    double low = _rect.left.lowerNearestMultipleOf(_gap);
-    double high = _rect.right.higherNearestMultipleOf(_gap);
+    double low = _viewport.left.lowerNearestMultipleOf(_gap);
+    double high = _viewport.right.higherNearestMultipleOf(_gap);
     for (double x = low; x <= high + 1e-8; x += _gap) {
       if (_skip.any((v) => (v - x).abs() < 1e-6)) continue;
       points.add(AnchoredTextComponent(
@@ -140,7 +140,7 @@ class HAxisTickLabelComponent implements Component, NeedsDetach {
 }
 
 class VAxisTickLabelComponent implements Component, NeedsDetach {
-  R _rect;
+  R _viewport;
 
   double _gap;
 
@@ -154,23 +154,24 @@ class VAxisTickLabelComponent implements Component, NeedsDetach {
 
   String Function(double) _tickLabeler;
 
-  Set<double> _skip;
+  List<double> _skip;
 
   VAxisTickLabelComponent(
-    this._rect, {
-    double gap = 10,
-    double atX = 0,
+    this._viewport, {
+    double gap = 100,
+    double atX = -5,
     bool flip = false,
     TextStyle? style,
     Alignment alignment = Alignment.centerRight,
     String Function(double) tickLabeler = tickLabeler,
-    Set<double> skip = const {},
+    List<double> skip = const [0],
   })  : _gap = gap,
         _atX = atX,
         _flip = flip,
         _style = style ?? TextStyle(color: Colors.black),
         _alignment = alignment,
-        _tickLabeler = tickLabeler, _skip = skip.toSet() {
+        _tickLabeler = tickLabeler,
+        _skip = skip.toList() {
     _compute();
   }
 
@@ -196,16 +197,17 @@ class VAxisTickLabelComponent implements Component, NeedsDetach {
   }
 
   void set(
-      {R? rect,
+      {R? viewport,
       double? gap,
       double? atX,
       bool? flip,
       TextStyle? style,
       Alignment? alignment,
-      String Function(double)? tickLabeler, Set<double>? skip}) {
+      String Function(double)? tickLabeler,
+      List<double>? skip}) {
     bool needsUpdate = false;
-    if (rect != null && rect != _rect) {
-      _rect = rect;
+    if (viewport != null && !viewport.equals(_viewport)) {
+      _viewport = viewport;
       needsUpdate = true;
     }
     if (gap != null && _gap != gap) {
@@ -235,7 +237,7 @@ class VAxisTickLabelComponent implements Component, NeedsDetach {
       _tickLabeler = tickLabeler;
       needsUpdate = true;
     }
-    if (skip != null && setEquals(_skip, skip)) {
+    if (skip != null && listEquals(_skip, skip)) {
       _skip = skip;
       needsUpdate = true;
     }
@@ -247,8 +249,8 @@ class VAxisTickLabelComponent implements Component, NeedsDetach {
   void _compute() {
     _ctx?.unregisterComponents(_texts);
     final points = <AnchoredTextComponent>[];
-    double low = _rect.top.lowerNearestMultipleOf(_gap);
-    double high = _rect.bottom.higherNearestMultipleOf(_gap);
+    double low = _viewport.top.lowerNearestMultipleOf(_gap);
+    double high = _viewport.bottom.higherNearestMultipleOf(_gap);
     for (double y = low; y <= high + 1e-8; y += _gap) {
       if (_skip.any((v) => (v - y).abs() < 1e-6)) continue;
       points.add(AnchoredTextComponent(

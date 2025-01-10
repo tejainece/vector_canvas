@@ -4,13 +4,13 @@ import 'package:vector_canvas/vector_canvas.dart';
 import 'package:vector_path/vector_path.dart';
 
 class HAxisGridComponent extends Component implements NeedsDetach {
-  R _rect;
+  R _viewport;
 
   double _gap;
   Stroke _stroke;
 
-  HAxisGridComponent(this._rect,
-      {double gap = 10, Stroke stroke = const Stroke()})
+  HAxisGridComponent(this._viewport,
+      {double gap = 100, Stroke stroke = const Stroke()})
       : _gap = gap,
         _stroke = stroke {
     _compute();
@@ -25,10 +25,10 @@ class HAxisGridComponent extends Component implements NeedsDetach {
     }
   }
 
-  void set({R? rect, double? gap, Stroke? stroke}) {
+  void set({R? viewport, double? gap, Stroke? stroke}) {
     bool needsCompute = false;
-    if (rect != null && rect != _rect) {
-      _rect = rect;
+    if (viewport != null && !viewport.equals(_viewport)) {
+      _viewport = viewport;
       needsCompute = true;
     }
     if (gap != null && _gap != gap) {
@@ -51,11 +51,11 @@ class HAxisGridComponent extends Component implements NeedsDetach {
       _ctx?.unregisterComponent(component);
     }
     final children = <LineComponent>[];
-    double low = _rect.top.lowerNearestMultipleOf(_gap);
-    double high = _rect.bottom.higherNearestMultipleOf(_gap);
+    double low = _viewport.top.lowerNearestMultipleOf(_gap);
+    double high = _viewport.bottom.higherNearestMultipleOf(_gap);
     for (double y = low; y <= high + 1e-8; y += _gap) {
       final component = LineComponent(
-          LineSegment(P(_rect.left, y), P(_rect.right, y)),
+          LineSegment(P(_viewport.left, y), P(_viewport.right, y)),
           stroke: _stroke);
       children.add(component);
       _ctx?.registerComponent(component);
@@ -83,13 +83,13 @@ class HAxisGridComponent extends Component implements NeedsDetach {
 }
 
 class VAxisGridComponent extends Component implements NeedsDetach {
-  R _rect;
+  R _viewport;
 
   double _gap;
   Stroke _stroke;
 
-  VAxisGridComponent(this._rect,
-      {double gap = 10, Stroke stroke = const Stroke()})
+  VAxisGridComponent(this._viewport,
+      {double gap = 100, Stroke stroke = const Stroke()})
       : _gap = gap,
         _stroke = stroke {
     _compute();
@@ -104,10 +104,10 @@ class VAxisGridComponent extends Component implements NeedsDetach {
     }
   }
 
-  void set({R? rect, double? gap, Stroke? stroke}) {
+  void set({R? viewport, double? gap, Stroke? stroke}) {
     bool needsCompute = false;
-    if (rect != null && rect != _rect) {
-      _rect = rect;
+    if (viewport != null && !viewport.equals(_viewport)) {
+      _viewport = viewport;
       needsCompute = true;
     }
     if (gap != null && _gap != gap) {
@@ -130,11 +130,11 @@ class VAxisGridComponent extends Component implements NeedsDetach {
       _ctx?.unregisterComponent(component);
     }
     final children = <LineComponent>[];
-    double low = _rect.left.lowerNearestMultipleOf(_gap);
-    double high = _rect.right.higherNearestMultipleOf(_gap);
+    double low = _viewport.left.lowerNearestMultipleOf(_gap);
+    double high = _viewport.right.higherNearestMultipleOf(_gap);
     for (double x = low; x < high + 1e-8; x += _gap) {
       final component = LineComponent(
-          LineSegment(P(x, _rect.top), P(x, _rect.bottom)),
+          LineSegment(P(x, _viewport.top), P(x, _viewport.bottom)),
           stroke: _stroke);
       children.add(component);
       _ctx?.registerComponent(component);

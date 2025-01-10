@@ -121,17 +121,33 @@ class PointControlComponent extends Component
   }
 
   late final TapDetector _tapDetector = TapDetector(
-    onTap: (_) {
-      controlData?.toggle(append: HardwareKeyboard.instance.isShiftPressed);
+    onTap: (e) {
+      if (_wasSelected) {
+        controlData?.toggle(e.pointer,
+            append: HardwareKeyboard.instance.isShiftPressed);
+      } else {
+        controlData?.select(e.pointer,
+            append: HardwareKeyboard.instance.isShiftPressed);
+      }
+      _wasSelected = false;
     },
+    debug: controlData?.id,
   );
 
+  bool _wasSelected = false;
+
   @override
-  void handlePointerEvent(PointerEvent event) {
-    if (!hitTest(event.position)) {
+  void handlePointerEvent(PointerEvent e) {
+    if (!hitTest(e.position)) {
       return;
     }
-    _tapDetector.handlePointerEvent(event);
+    if (e is PointerDownEvent) {
+      _wasSelected = controlData?.isSelected ?? false;
+      controlData?.append(e.pointer);
+    } else if (e is PointerCancelEvent) {
+      _wasSelected = false;
+    }
+    _tapDetector.handlePointerEvent(e);
   }
 
   @override
@@ -166,7 +182,15 @@ class ControlData {
 
   bool get isSelected => controls.isSelected(id);
 
-  void toggle({bool append = false}) {
-    controls.toggle(id, append: append);
+  void toggle(int pointer, {bool append = false}) {
+    controls.toggle(pointer, id, append: append);
+  }
+
+  void select(int pointer, {bool append = false}) {
+    controls.select(pointer, id, append: append);
+  }
+
+  void append(int pointer) {
+    controls.append(pointer, id);
   }
 }
