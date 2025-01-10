@@ -143,7 +143,8 @@ class PointControlComponent extends Component
     }
     if (e is PointerDownEvent) {
       _wasSelected = controlData?.isSelected ?? false;
-      controlData?.append(e.pointer);
+      controlData?.select(e.pointer,
+          append: HardwareKeyboard.instance.isShiftPressed);
     } else if (e is PointerCancelEvent) {
       _wasSelected = false;
     }

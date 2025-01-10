@@ -47,7 +47,7 @@ class _MyHomePageState extends State<MyHomePage> {
     _update();
     final line1 = LineSegment(lp1, lp2);
     final circle = Circle(center: center, radius: radius);
-    final intersects = line1.intersectCircle(circle);
+    final intersects = line1.standardForm.intersectCircle(circle);
 
     return Scaffold(
       body: Column(
