@@ -1,7 +1,6 @@
 import 'dart:typed_data';
 import 'dart:ui';
 
-import 'package:flutter/gestures.dart';
 import 'package:game_engine/game_engine.dart';
 
 class TransformComponent implements Component, NeedsDetach {

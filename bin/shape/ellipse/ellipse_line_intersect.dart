@@ -1,6 +1,10 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
 import 'package:vector_canvas/vector_canvas.dart';
 import 'package:vector_path/vector_path.dart';
+
+import '../../_ui/controls.dart';
 
 void main() {
   runApp(const MyApp());
@@ -12,7 +16,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Line.normalAt',
+      title: 'Ellipse.lerp',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
@@ -35,19 +39,18 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
   }
 
-  P lp1 = P(-100, -200);
-  P lp2 = P(-100, 200);
-  P center = P(0, 0);
-  double radius = 100;
-
-  P get rp => center + P(radius, 0);
+  double rotation = 0;
+  var center = P(0, 0);
+  var radii = P(100, 80);
+  P lp1 = P(-100, -100);
+  P lp2 = P(100, 100);
 
   @override
   Widget build(BuildContext context) {
     _update();
+    final ellipse = Ellipse(radii, center: center, rotation: rotation);
     final line1 = LineSegment(lp1, lp2);
-    final circle = Circle(center: center, radius: radius);
-    final intersects = line1.standardForm.intersectCircle(circle);
+    final intersects = line1.standardForm.intersectEllipse(ellipse);
 
     return Scaffold(
       body: Column(
@@ -55,7 +58,18 @@ class _MyHomePageState extends State<MyHomePage> {
         children: [
           Wrap(
             crossAxisAlignment: WrapCrossAlignment.center,
-            children: [],
+            children: [
+              slider('Theta', rotation, 0, 2 * pi,
+                  (value) => setState(() => rotation = value)),
+              slider('Center.x', center.x, -400, 400,
+                  (value) => setState(() => center = P(value, center.y))),
+              slider('Center.y', center.y, -400, 400,
+                  (value) => setState(() => center = P(center.x, value))),
+              slider('Radii.x', radii.x, 0, 400,
+                  (value) => setState(() => radii = P(value, radii.y))),
+              slider('Radii.y', radii.y, 0, 400,
+                  (value) => setState(() => radii = P(radii.x, value))),
+            ],
           ),
           Expanded(
             child: GameWidget(
@@ -65,13 +79,12 @@ class _MyHomePageState extends State<MyHomePage> {
                   : centeredYDownWith(translate: viewport.center),
               component: LayerComponent([
                 AxisComponent(viewport, yUp: yUp),
+                EllipseComponent(ellipse),
                 SegmentsComponent([line1], stroke: Stroke(strokeWidth: 5)),
-                CircleComponent(circle),
                 PointsComponent(intersects),
                 lp1Control,
                 lp2Control,
                 centerControl,
-                rpControl,
               ]),
               onResize: (size) {
                 setState(() {
@@ -97,16 +110,12 @@ class _MyHomePageState extends State<MyHomePage> {
   late final centerControl = PointControlComponent(center,
       selected: controls.isSelected(PointId.center),
       controlData: ControlData(controls, PointId.center));
-  late final rpControl = PointControlComponent(rp,
-      selected: controls.isSelected(PointId.rp),
-      controlData: ControlData(controls, PointId.rp));
 
   void _update() {
     lp1Control.set(point: lp1, selected: controls.isSelected(PointId.lp1));
     lp2Control.set(point: lp2, selected: controls.isSelected(PointId.lp2));
     centerControl.set(
         point: center, selected: controls.isSelected(PointId.center));
-    rpControl.set(point: rp, selected: controls.isSelected(PointId.rp));
   }
 
   void _onTap(ClickEvent data) {
@@ -137,9 +146,7 @@ class _MyHomePageState extends State<MyHomePage> {
     PointId.lp1: Proxy(() => lp1, (v) => lp1 = v),
     PointId.lp2: Proxy(() => lp2, (v) => lp2 = v),
     PointId.center: Proxy(() => center, (v) => center = v),
-    PointId.rp:
-        Proxy(() => center + P(radius, 0), (v) => radius = v.x - center.x),
   };
 }
 
-enum PointId { lp1, lp2, center, rp }
+enum PointId { lp1, lp2, center }
