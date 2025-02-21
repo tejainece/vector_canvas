@@ -1,10 +1,6 @@
-import 'dart:math';
-
 import 'package:flutter/material.dart';
 import 'package:vector_canvas/vector_canvas.dart';
 import 'package:vector_path/vector_path.dart';
-
-import '../../_ui/controls.dart';
 
 void main() {
   runApp(const MyApp());
@@ -16,7 +12,7 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Ellipse.lerp',
+      title: 'Line.normalAt',
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
@@ -39,38 +35,29 @@ class _MyHomePageState extends State<MyHomePage> {
     super.initState();
   }
 
-  double rotation = 0;
-  var center = P(0, 0);
-  var radii = P(100, 100);
-  P lp1 = P(-100, -100);
-  P lp2 = P(100, -100);// P(100, 100);
+  P c1 = P(0, 0);
+  double r1 = 100;
+  P c2 = P(0, 150);
+  double r2 = 100;
+
+  P get rp1 => c1 + P(r1, 0);
+
+  P get rp2 => c2 + P(r2, 0);
 
   @override
   Widget build(BuildContext context) {
     _update();
-    final ellipse = Ellipse(radii, center: center, rotation: rotation);
-    final line1 = LineSegment(lp1, lp2);
-    final intersects = line1.standardForm
-        .intersectEllipse(ellipse)
-        .toList();
+    final circle1 = Circle(center: c1, radius: r1);
+    final circle2 = Circle(center: c2, radius: r2);
+    final intersects = circle1.intersectCircle(circle2).where((e) => !e.isNaN);
+
     return Scaffold(
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Wrap(
             crossAxisAlignment: WrapCrossAlignment.center,
-            children: [
-              slider('Theta', rotation, 0, 2 * pi,
-                  (value) => setState(() => rotation = value)),
-              slider('Center.x', center.x, -400, 400,
-                  (value) => setState(() => center = P(value, center.y))),
-              slider('Center.y', center.y, -400, 400,
-                  (value) => setState(() => center = P(center.x, value))),
-              slider('Radii.x', radii.x, 0, 400,
-                  (value) => setState(() => radii = P(value, radii.y))),
-              slider('Radii.y', radii.y, 0, 400,
-                  (value) => setState(() => radii = P(radii.x, value))),
-            ],
+            children: [],
           ),
           Expanded(
             child: GameWidget(
@@ -80,12 +67,15 @@ class _MyHomePageState extends State<MyHomePage> {
                   : centeredYDownWith(translate: viewport.center),
               component: LayerComponent([
                 AxisComponent(viewport, yUp: yUp),
-                EllipseComponent(ellipse),
-                SegmentsComponent([line1], stroke: Stroke(strokeWidth: 5)),
-                PointsComponent(intersects),
-                lp1Control,
-                lp2Control,
-                centerControl,
+                CircleComponent(circle1),
+                CircleComponent(circle2),
+                PointsComponent(intersects,
+                    vertexPainter: CircularVertexPainter(5,
+                        fill: Fill(color: Colors.red))),
+                c1Control,
+                c2Control,
+                rp1Control,
+                rp2Control,
               ]),
               onResize: (size) {
                 setState(() {
@@ -102,21 +92,32 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 
-  late final lp1Control = PointControlComponent(lp1,
-      selected: controls.isSelected(PointId.lp1),
-      controlData: ControlData(controls, PointId.lp1));
-  late final lp2Control = PointControlComponent(lp2,
-      selected: controls.isSelected(PointId.lp2),
-      controlData: ControlData(controls, PointId.lp2));
-  late final centerControl = PointControlComponent(center,
-      selected: controls.isSelected(PointId.center),
-      controlData: ControlData(controls, PointId.center));
+  late final c1Control = PointControlComponent(c1,
+      selected: controls.isSelected(PointId.c1),
+      controlData: ControlData(controls, PointId.c1),
+      fill: null,
+      stroke: Stroke(color: Colors.blue, strokeWidth: 2));
+  late final c2Control = PointControlComponent(c2,
+      selected: controls.isSelected(PointId.c2),
+      controlData: ControlData(controls, PointId.c2),
+      fill: null,
+      stroke: Stroke(color: Colors.blue, strokeWidth: 2));
+  late final rp1Control = PointControlComponent(rp1,
+      selected: controls.isSelected(PointId.rp1),
+      controlData: ControlData(controls, PointId.rp1),
+      fill: null,
+      stroke: Stroke(color: Colors.blue, strokeWidth: 2));
+  late final rp2Control = PointControlComponent(rp2,
+      selected: controls.isSelected(PointId.rp2),
+      controlData: ControlData(controls, PointId.rp2),
+      fill: null,
+      stroke: Stroke(color: Colors.blue, strokeWidth: 2));
 
   void _update() {
-    lp1Control.set(point: lp1, selected: controls.isSelected(PointId.lp1));
-    lp2Control.set(point: lp2, selected: controls.isSelected(PointId.lp2));
-    centerControl.set(
-        point: center, selected: controls.isSelected(PointId.center));
+    c1Control.set(point: c1, selected: controls.isSelected(PointId.c1));
+    c2Control.set(point: c2, selected: controls.isSelected(PointId.c2));
+    rp1Control.set(point: rp1, selected: controls.isSelected(PointId.rp1));
+    rp2Control.set(point: rp2, selected: controls.isSelected(PointId.rp2));
   }
 
   void _onTap(ClickEvent data) {
@@ -144,10 +145,11 @@ class _MyHomePageState extends State<MyHomePage> {
   late final controls = Controls(onChanged: () => setState(() {}));
 
   late final _map = <PointId, Proxy<P>>{
-    PointId.lp1: Proxy(() => lp1, (v) => lp1 = v),
-    PointId.lp2: Proxy(() => lp2, (v) => lp2 = v),
-    PointId.center: Proxy(() => center, (v) => center = v),
+    PointId.c1: Proxy(() => c1, (v) => c1 = v),
+    PointId.rp1: Proxy(() => c1 + P(r1, 0), (v) => r1 = v.x - c1.x),
+    PointId.c2: Proxy(() => c2, (v) => c2 = v),
+    PointId.rp2: Proxy(() => c2 + P(r2, 0), (v) => r2 = v.x - c2.x),
   };
 }
 
-enum PointId { lp1, lp2, center }
+enum PointId { c1, rp1, c2, rp2 }
