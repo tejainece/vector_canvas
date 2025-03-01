@@ -1,7 +1,7 @@
 import 'dart:ui';
 
 import 'package:vector_canvas/vector_canvas.dart';
-import 'package:vector_path/vector_path.dart';
+import 'package:ramanujan/ramanujan.dart';
 
 class HAxisTickComponent extends Component {
   R _viewport;

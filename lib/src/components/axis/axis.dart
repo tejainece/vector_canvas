@@ -4,7 +4,7 @@ import 'package:vector_canvas/src/components/axis/axis_grid_component.dart';
 import 'package:vector_canvas/src/components/axis/axis_spine_component.dart';
 import 'package:vector_canvas/src/components/axis/axis_tick_component.dart';
 import 'package:vector_canvas/src/components/axis/axis_tick_label_component.dart';
-import 'package:vector_path/vector_path.dart';
+import 'package:ramanujan/ramanujan.dart';
 
 export 'axis_grid_component.dart';
 export 'axis_spine_component.dart';

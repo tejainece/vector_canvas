@@ -10,8 +10,8 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.8
-  vector_path:
-    path: ../vector_path
+  ramanujan:
+    path: ../ramanujan
   game_engine:
     path: ../../f4b/game_engine
 
