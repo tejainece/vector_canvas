@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:game_engine/game_engine.dart';
-import 'package:vector_canvas/vector_canvas.dart';
 import 'package:ramanujan/ramanujan.dart';
+import 'package:vector_canvas/vector_canvas.dart';
 
 class SegmentsComponent implements Component {
   List<Segment> _segments;
@@ -62,7 +62,7 @@ class LineComponent extends Component {
 
   @override
   void render(Canvas canvas) {
-    canvas.drawLine(_line.p1.o, _line.p2.o, _strokePaint);
+    paintLineSegment(canvas, _line, strokePaint: _strokePaint);
   }
 
   void set({LineSegment? line, Stroke? stroke}) {
@@ -88,5 +88,10 @@ class LineComponent extends Component {
   @override
   void onAttach(ComponentContext ctx) {
     _ctx = ctx;
+  }
+
+  static void paintLineSegment(Canvas canvas, LineSegment line,
+      {Stroke stroke = const Stroke(), Paint? strokePaint}) {
+    canvas.drawLine(line.p1.o, line.p2.o, strokePaint ?? stroke.paint);
   }
 }
